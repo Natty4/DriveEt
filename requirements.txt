@@ -1,0 +1,16 @@
+django-filter 
+django-phonenumber-field 
+phonenumbers 
+drf-yasg 
+psycopg2-binary 
+redis 
+django-redis 
+google-generativeai 
+python-jose 
+python-dotenv 
+django-extensions 
+gunicorn
+PyJWT
+Faker
+qrcode
+djangorestframework-simplejwt
