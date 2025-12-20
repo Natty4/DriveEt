@@ -29,7 +29,7 @@ class AccessControlMiddleware:
     
     # Endpoints that are completely public (no bundle required)
     PUBLIC_ENDPOINTS = [
-        r'^/api/v1/home/$',
+        r'^/api/v1/meta/$',
         r'^/api/v1/payment/$',
         r'^/api/v1/payment/methods/',
         r'^/media/.*',
