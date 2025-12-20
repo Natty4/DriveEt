@@ -14,3 +14,4 @@ PyJWT
 Faker
 qrcode
 djangorestframework-simplejwt
+corsheaders
