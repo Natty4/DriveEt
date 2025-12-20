@@ -16,3 +16,4 @@ qrcode
 djangorestframework-simplejwt
 django-cors-headers
 Pillow
+dj-database-url

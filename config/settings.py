@@ -3,6 +3,7 @@ import os
 import dotenv
 from pathlib import Path
 from datetime import timedelta
+import dj_database_url
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,6 +80,16 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
+# Override DB in production
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=not DEBUG,
+    )
 
 # Caching
 # CACHES = {
