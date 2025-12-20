@@ -14,4 +14,4 @@ PyJWT
 Faker
 qrcode
 djangorestframework-simplejwt
-corsheaders
+django-cors-headers
