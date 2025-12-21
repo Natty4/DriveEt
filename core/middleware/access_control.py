@@ -41,7 +41,7 @@ class AccessControlMiddleware:
     AUTH_REQUIRED_ENDPOINTS = [
         r'^/api/v1/auth/me/$',
         r'^/api/v1/payment/verify/$',
-        r'^/api/v1/bundle/.*',
+        r'^/api/v1/bundles/.*',
     ]
     
     def __init__(self, get_response):

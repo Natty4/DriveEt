@@ -48,13 +48,9 @@ urlpatterns = [
     path('bundles/', include(bundle_router.urls)),
     path('bundles/', include(order_router.urls)),
     path('bundles/resources/', bundles.BundlePurchaseViewSet.as_view({'get': 'resources'}), name='bundle-resources'),
-    
-    
     # Complete purchase flow
     path('bundles/purchase-flow/', bundles.BundlePurchaseFlowView.as_view(), name='bundle-purchase-flow'),
     
-    # Resource status
-    path('bundles/resources/', bundles.BundlePurchaseViewSet.as_view({'get': 'resources'}), name='bundle-resources'),
     
     # Questions endpoints
     path('questions/', include(question_router.urls)),
