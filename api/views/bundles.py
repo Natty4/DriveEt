@@ -189,6 +189,8 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
         serializer = VerifyPaymentRequestSerializer(data=request.data)
         
         if not serializer.is_valid():
+            print(request.data, '-------------- 1 -')
+            print(serializer.errors, '-------------- 2 -')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         # Verify payment
