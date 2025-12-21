@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,13 +85,12 @@ DATABASES = {
 # Override DB in production
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASES = {
-    "default": dj_database_url.parse(
+if DATABASE_URL:
+    DATABASES["default"] = dj_database_url.parse(
         DATABASE_URL,
-        conn_max_age=0,     # REQUIRED for pooler
+        conn_max_age=0,
         ssl_require=True,
     )
-}
 
 # Caching
 # CACHES = {
@@ -135,6 +135,7 @@ USE_TZ = True
 # Static files
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
