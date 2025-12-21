@@ -29,12 +29,11 @@ logger = logging.getLogger(__name__)
 
 class LandingView(APIView):
     """
-    GET /api/v1/home/
-    Enhanced landing/home API - returns all data needed for initial app load.
+    GET /api/v1/meta/
+    Enhanced landing/meta API - returns all data needed for initial app load.
     Includes metadata, subscription plans, statistics, payment methods, and ALL FREE questions.
     Accessible to everyone (no auth required). Pro users identified for status only.
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [AllowAny]
 
     def get(self, request):

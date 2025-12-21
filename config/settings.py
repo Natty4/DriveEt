@@ -52,7 +52,7 @@ MIDDLEWARE = [
     # 'core.middleware.access_control.SubscriptionAccessMiddleware',
     # 'core.middleware.access_control.UsageTrackingMiddleware',
     # 'core.middleware.tier_access.TierAccessMiddleware',
-    'core.middleware.access_control.AccessControlMiddleware',
+    # 'core.middleware.access_control.AccessControlMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -184,7 +184,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',  # Fallback for web
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # Default: require authentication
+        'rest_framework.permissions.AllowAny',  # Default: require authentication
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',

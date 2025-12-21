@@ -15,6 +15,7 @@ from core.serializers import (
     RoadSignSerializer, QuestionSerializer, SearchResultSerializer
 )
 from core.services import BundleService
+from core.permissions import IsTelegramAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,7 @@ class SearchView(APIView):
     GET /api/v1/search/
     Perform search with bundle consumption
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def get(self, request):
         query = request.query_params.get('q', '').strip()

@@ -15,7 +15,6 @@ from core.permissions import IsTelegramAuthenticated
 
 class ChatAssistantView(APIView):
     """AI Chat Assistant using Google Gemini"""
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
@@ -128,7 +127,6 @@ class ChatAssistantView(APIView):
 
 class ChatUsageView(APIView):
     """Get chat usage statistics"""
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def get(self, request):

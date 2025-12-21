@@ -19,6 +19,7 @@ from core.serializers import (
     PaymentVerificationResponseSerializer
 )
 from core.services import BundleService, BundleOrderService
+from core.permissions import IsTelegramAuthenticated
 
 
 
@@ -30,7 +31,6 @@ class BundleDefinitionViewSet(viewsets.ReadOnlyModelViewSet):
     GET /api/v1/bundles/definitions/
     Get available bundle definitions
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated]
     serializer_class = BundleDefinitionSerializer
     queryset = BundleDefinition.objects.filter(is_active=True).order_by('order')
@@ -54,7 +54,6 @@ class UserBundleViewSet(viewsets.ReadOnlyModelViewSet):
     GET /api/v1/bundles/my/
     Get user's bundles
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated]
     serializer_class = UserBundleSerializer
     
@@ -84,7 +83,6 @@ class BundlePurchaseViewSet(viewsets.ModelViewSet):
     POST /api/v1/bundles/purchase/
     Purchase a new bundle
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated]
     serializer_class = BundlePurchaseSerializer
     
@@ -142,10 +140,10 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
     """
     Bundle order management with payment verification flow
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     serializer_class = BundleOrderSerializer
     
+
     def get_queryset(self):
         return BundleOrder.objects.filter(user=self.request.user).order_by('-created_at')
     
@@ -187,6 +185,8 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
         POST /api/v1/bundles/orders/verify_payment/
         Verify payment for an order (Step 2)
         """
+        print('2    ----------------')
+        
         serializer = VerifyPaymentRequestSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -305,7 +305,6 @@ class BundlePurchaseFlowView(APIView):
     Complete bundle purchase flow API
     Combines all steps in one endpoint for simplicity
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated]
     
     def post(self, request):

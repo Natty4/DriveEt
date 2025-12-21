@@ -10,6 +10,7 @@ import logging
 from core.models import AIChatHistory, ResourceTransaction
 from core.authentication import TelegramAuthenticationBackend
 from core.services import BundleService
+from core.permissions import IsTelegramAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +19,7 @@ class AIChatView(APIView):
     """
     AI Chat with bundle consumption
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def __init__(self):
         super().__init__()

@@ -23,7 +23,6 @@ class PaymentMethodViewSet(viewsets.ReadOnlyModelViewSet):
     GET /api/v1/payment/
     Returns paywall content: active payment methods, instructions, and required amount
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [AllowAny]
     serializer_class = PaymentMethodSerializer
     queryset = PaymentMethod.objects.filter(is_active=True).order_by('order')
@@ -53,7 +52,6 @@ class PaymentVerificationView(APIView):
     POST /api/v1/payment/verify/
     Handle payment verification for bundle purchase
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):

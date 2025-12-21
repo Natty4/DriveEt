@@ -7,6 +7,7 @@ import logging
 
 from core.authentication import TelegramAuthenticationBackend
 from core.models import UserProfile
+from core.permissions import IsTelegramAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +17,7 @@ class UserAccessView(APIView):
     GET /api/v1/subscription/access/
     Get user's subscription access information
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def get(self, request):
         try:
@@ -97,8 +97,7 @@ class FeatureAccessView(APIView):
     POST /api/v1/subscription/check-access/
     Check access to specific feature
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
         feature_name = request.data.get('feature')
@@ -145,8 +144,7 @@ class UseFeatureView(APIView):
     POST /api/v1/subscription/use-feature/
     Use a feature (consume quota)
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
         feature_name = request.data.get('feature')

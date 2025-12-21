@@ -21,7 +21,7 @@ from core.serializers import (
     QuestionSerializer, RoadSignSerializer, RoadSignCategorySerializer,
     PaymentMethodSerializer, OptimizedQuestionSerializer, QuestionCategorySerializer
 )
-from core.permissions import IsProUser, IsProUserForOfflineCache
+from core.permissions import IsTelegramAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 logger = logging.getLogger(__name__)
@@ -32,8 +32,7 @@ class QuestionViewSet(viewsets.ReadOnlyModelViewSet):
     API endpoint for questions with category filtering
     Returns ALL data with ALL translations - filtering is done client-side
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated, IsProUser]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['translations__content']
@@ -259,8 +258,7 @@ class AllDataView(APIView):
     Includes ALL questions, road signs, categories, payment methods with ALL translations
     Pro users only
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsProUserForOfflineCache]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def get(self, request):
         user = request.user
@@ -477,8 +475,7 @@ class RefreshCacheTokenView(APIView):
     POST /api/v1/questions/all/refresh_token/
     Generate new cache token for offline data
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsProUserForOfflineCache]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
         """

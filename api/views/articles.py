@@ -16,7 +16,6 @@ class ArticleCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Article categories
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [AllowAny]
     serializer_class = ArticleCategorySerializer
     queryset = ArticleCategory.objects.filter(is_active=True).order_by('order')
@@ -37,7 +36,6 @@ class ArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Articles and legal documents
     """
-    authentication_classes = [TelegramAuthenticationBackend]
     permission_classes = [AllowAny]  # Changed to check in get_queryset
     serializer_class = ArticleSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]

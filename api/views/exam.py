@@ -15,6 +15,7 @@ from core.models import (
 from core.authentication import TelegramAuthenticationBackend
 from core.serializers import ExamSessionSerializer, QuestionSerializer
 from core.services import BundleService
+from core.permissions import IsTelegramAuthenticated
 
 logger = logging.getLogger(__name__)
 
@@ -23,8 +24,7 @@ class ExamViewSet(viewsets.ModelViewSet):
     """
     API for exam simulation with bundle consumption
     """
-    authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     serializer_class = ExamSessionSerializer
     queryset = ExamSession.objects.all()
     

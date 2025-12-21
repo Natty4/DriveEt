@@ -17,10 +17,8 @@ class TelegramLoginView(APIView):
     Header:
         Authorization: TMA <init_data>
     """
-
     permission_classes = [AllowAny]
-    authentication_classes = [TelegramAuthenticationBackend]
-
+    
     def post(self, request):
         user = request.user
 
