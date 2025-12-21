@@ -581,8 +581,6 @@ class PaymentMethodTranslationAdmin(admin.ModelAdmin):
     instruction_preview.short_description = _('Instruction')
 
 
-
-
 # @admin.register(SubscriptionPlan)
 # class SubscriptionPlanAdmin(admin.ModelAdmin):
 #     list_display = ['name', 'plan_type', 'price_etb', 'duration_days', 'is_active', 'order']
@@ -627,12 +625,110 @@ class AIChatHistoryAdmin(admin.ModelAdmin):
     search_fields = ['user__username', 'question', 'answer']
     raw_id_fields = ['user']
     
-    
+
+
 @admin.register(BundleDefinition)
 class BundleDefinitionAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'is_active', 'recommended', 'order']
+    list_display = ('name', 'code', 'price_display', 'validity_days', 'quota_summary', 'is_active', 'recommended', 'order')
+    list_editable = ('is_active', 'recommended', 'order')
+    search_fields = ('name', 'code')
+    list_filter = ('is_active', 'recommended')
     
+    fieldsets = (
+        (_('Basic Information'), {
+            'fields': ('name', 'code', 'description', 'price_etb', 'validity_days')
+        }),
+        (_('Resource Quotas (0 = Unlimited)'), {
+            'fields': ('exam_quota', 'total_chat_quota', 'daily_chat_limit', 'search_quota', 'has_unlimited_road_sign_quiz'),
+            'description': _('Define the limitations for this bundle type.')
+        }),
+        (_('Display & Sorting'), {
+            'fields': ('is_active', 'recommended', 'order'),
+            'classes': ('collapse',)
+        }),
+    )
 
+    def price_display(self, obj):
+        return format_html("<b>{} ETB</b>", obj.price_etb)
+    price_display.short_description = _("Price")
+
+    def quota_summary(self, obj):
+        return format_html(
+            "Exams: {} | Chats: {} | Search: {}",
+            "∞" if obj.is_unlimited_exams else obj.exam_quota,
+            "∞" if obj.is_unlimited_chats else obj.total_chat_quota,
+            "∞" if obj.is_unlimited_search else obj.search_quota
+        )
+    quota_summary.short_description = _("Quotas")
+    
+    
+    
+class ResourceTransactionInline(admin.TabularInline):
+    model = ResourceTransaction
+    extra = 0
+    readonly_fields = ('transaction_type', 'resource_type', 'quantity', 'exams_after', 'chats_after', 'created_at')
+    can_delete = False
+
+@admin.register(UserBundle)
+class UserBundleAdmin(admin.ModelAdmin):
+    list_display = ('user', 'bundle_definition', 'expiry_status', 'exams_remaining', 'chats_remaining', 'is_active')
+    list_filter = ('is_active', 'bundle_definition', 'expiry_date')
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('purchase_date', 'total_chats_consumed', 'daily_chats_used', 'last_chat_reset')
+    inlines = [ResourceTransactionInline]
+
+    def expiry_status(self, obj):
+        if obj.is_expired:
+            return format_html('<span style="color: red;">Expired ({})</span>', obj.expiry_date.date())
+        return format_html('<span style="color: green;">Expires {}</span>', obj.expiry_date.date())
+    expiry_status.short_description = _("Status")
+
+@admin.register(ResourceTransaction)
+class ResourceTransactionAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'user', 'transaction_type', 'resource_type', 'quantity_display', 'reference')
+    list_filter = ('transaction_type', 'resource_type', 'created_at')
+    search_fields = ('user__username', 'reference', 'description')
+
+    def quantity_display(self, obj):
+        color = "green" if obj.quantity > 0 else "red"
+        return format_html('<span style="color: {}; font-weight: bold;">{:+}</span>', color, obj.quantity)
+    quantity_display.short_description = _("Qty")
+    
+    
+@admin.register(BundleOrder)
+class BundleOrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'bundle_definition', 'order_amount', 'status', 'reference_number', 'created_at')
+    list_filter = ('status', 'payment_method', 'created_at')
+    search_fields = ('reference_number', 'user__username', 'id')
+    readonly_fields = ('ip_address', 'user_agent', 'expires_at')
+    actions = ['mark_as_verified']
+
+    def mark_as_verified(self, request, queryset):
+        for order in queryset.filter(status=BundleOrder.OrderStatus.PENDING):
+            order.status = BundleOrder.OrderStatus.PAYMENT_VERIFIED
+            order.verified_amount = order.order_amount
+            order.verified_at = timezone.now()
+            order.save()
+        self.message_user(request, _("Selected orders marked as verified."))
+    mark_as_verified.short_description = _("Step 1: Verify Payment (Manual)")
+
+@admin.register(BundlePurchase)
+class BundlePurchaseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'bundle_definition', 'amount_paid', 'payment_status', 'reference_number', 'verified_by', 'created_at')
+    list_filter = ('payment_status', 'payment_method', 'created_at')
+    search_fields = ('reference_number', 'transaction_id', 'user__username')
+    readonly_fields = ('verified_at', 'verified_by', 'user_bundle', 'ip_address', 'user_agent')
+    
+    fieldsets = (
+        (_('Transaction Info'), {'fields': ('user', 'bundle_definition', 'order', 'user_bundle')}),
+        (_('Payment Details'), {'fields': ('amount_paid', 'payment_method', 'payment_status', 'reference_number', 'transaction_id')}),
+        (_('Verification Audit'), {'fields': ('verified_at', 'verified_by')}),
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk and not obj.verified_by:
+            obj.verified_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 

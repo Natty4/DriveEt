@@ -122,9 +122,10 @@ class Command(BaseCommand):
             )
             if created:
                 self.stdout.write(self.style.SUCCESS(f"Created category: {category.code}"))
-
+            
             for lang in languages:
-                QuestionCategoryTranslation.objects.update_or_create(
+                # Changed to get_or_create to prevent overwriting existing translations
+                QuestionCategoryTranslation.objects.get_or_create(
                     category=category,
                     language=lang,
                     defaults={
@@ -189,11 +190,12 @@ class Command(BaseCommand):
 
         sign_categories = {}
         for cat_data in road_sign_categories_data:
-            cat, _ = RoadSignCategory.objects.get_or_create(
+            cat, created = RoadSignCategory.objects.get_or_create(
                 code=cat_data['code'],
                 defaults={'order': cat_data['order']}
             )
             sign_categories[cat_data['code']] = cat
+            
             for lang in languages:
                 RoadSignCategoryTranslation.objects.get_or_create(
                     category=cat,
@@ -349,14 +351,13 @@ class Command(BaseCommand):
 
         signs = {}
         for sign_data in signs_data:
-            sign, _ = RoadSign.objects.get_or_create(
+            sign, created = RoadSign.objects.get_or_create(
                 code=sign_data['code'],
                 defaults={
                     'image': sign_data['image'],
-                    'category': categories.get(sign_data['category']),
+                    'category': sign_categories.get(sign_data['category']), # Ensure using correct map
                 }
             )
-            signs[sign_data['code']] = sign
             for lang in languages:
                 RoadSignTranslation.objects.get_or_create(
                     road_sign=sign,
@@ -887,7 +888,7 @@ class Command(BaseCommand):
         ]
 
         for pm_data in payment_methods:
-            pm, _ = PaymentMethod.objects.get_or_create(
+            pm, created = PaymentMethod.objects.get_or_create(
                 code=pm_data["code"],
                 defaults={
                     "name": pm_data["name"],
@@ -897,7 +898,7 @@ class Command(BaseCommand):
                 },
             )
             for lang in languages:
-                PaymentMethodTranslation.objects.update_or_create(
+                PaymentMethodTranslation.objects.get_or_create(
                     payment_method=pm,
                     language=lang,
                     defaults={
@@ -1013,7 +1014,7 @@ class Command(BaseCommand):
         ]
 
         for i, bundle_data in enumerate(bundles, 1):
-            BundleDefinition.objects.update_or_create(
+            BundleDefinition.objects.get_or_create(
                 code=bundle_data["code"],
                 defaults={
                     "name": bundle_data["name"],
@@ -1082,7 +1083,7 @@ class Command(BaseCommand):
         }
 
         for art in articles:
-            Article.objects.update_or_create(
+            Article.objects.get_or_create(
                 slug=art["slug"],
                 defaults={
                     "title": art["title"],

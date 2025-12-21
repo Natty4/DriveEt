@@ -185,7 +185,6 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
         POST /api/v1/bundles/orders/verify_payment/
         Verify payment for an order (Step 2)
         """
-        print('2    ----------------')
         
         serializer = VerifyPaymentRequestSerializer(data=request.data)
         

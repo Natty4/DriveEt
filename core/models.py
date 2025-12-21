@@ -401,12 +401,22 @@ class ExplanationTranslation(models.Model):
 
 class PaymentMethod(models.Model):
     """Available payment methods"""
+    class MethodType(models.TextChoices):
+        BANK_TRANSFER = 'bank_transfer', _('Bank Transfer')
+        MOBILE_WALLET = 'MOBILE_WALLET', _('Mobile Wallet')
+        OTHER = 'other', _('Other Method')
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name=_("Name"))
     code = models.CharField(max_length=50, unique=True, verbose_name=_("Code"))
     logo = models.CharField(null=True, blank=True, help_text=_("A valid logo url"))
     is_active = models.BooleanField(default=True, verbose_name=_("Active"))
     order = models.PositiveSmallIntegerField(default=0, verbose_name=_("Display Order"))
+    method_type = models.CharField(
+        choices=MethodType,
+        default=MethodType.MOBILE_WALLET
+        
+    )
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
