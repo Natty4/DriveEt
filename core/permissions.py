@@ -87,24 +87,21 @@ class IsProUserForOfflineCache(BasePermission):
         return True
     
 
-class IsTelegramJWT(BasePermission):
-    """
-    Allows access only to JWTs issued via Telegram login.
-    """
-
+class IsTelegramAuthenticated(BasePermission):
     message = "Telegram authentication required."
 
     def has_permission(self, request, view):
-        token = getattr(request, "auth", None)
+        auth = request.auth
         user = request.user
 
-        if not token or not user or not user.is_authenticated:
+        if not auth or not user or not user.is_authenticated:
             return False
 
         return (
-            token.get("source") == "telegram"
-            and token.get("telegram_id") == getattr(user.profile, "telegram_id", None)
+            auth.get("source") == "telegram"
+            and auth.get("telegram_id") == getattr(user.profile, "telegram_id", None)
         )
+
         
         
         

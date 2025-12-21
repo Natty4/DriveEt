@@ -9,11 +9,14 @@ from django.core.cache import cache
 from django.conf import settings
 
 from core.models import User
+from core.authentication import TelegramAuthenticationBackend
+from core.permissions import IsTelegramAuthenticated
 
 
 class ChatAssistantView(APIView):
     """AI Chat Assistant using Google Gemini"""
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [TelegramAuthenticationBackend]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
         message = request.data.get('message')
@@ -125,13 +128,14 @@ class ChatAssistantView(APIView):
 
 class ChatUsageView(APIView):
     """Get chat usage statistics"""
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [TelegramAuthenticationBackend]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def get(self, request):
         user = request.user
         user.reset_chat_queries()
         
-        is_premium = user.is_premium()
+        is_premium = True
         limit = 100 if is_premium else 5
         
         return Response({

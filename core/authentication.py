@@ -48,19 +48,32 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             else:
                 logger.debug(f"User authenticated via Telegram: {user.username}")
             
-            return (user, None)
-            
+            return (
+                    user,
+                    {
+                        "source": "telegram",
+                        "telegram_id": telegram_user["id"],
+                    }
+                )
+        
+        except AuthenticationFailed:
+            raise
         except Exception as e:
-            logger.error(f"Telegram authentication error: {str(e)}")
-            raise AuthenticationFailed(f'Authentication failed: {str(e)}')
+            logger.exception("Unexpected Telegram auth error")
+            return None
+        
+        # except Exception as e:
+        #     logger.error(f"Telegram authentication error: {str(e)}")
+        #     raise AuthenticationFailed(f'Authentication failed: {str(e)}')
     
     def validate_telegram_init_data(self, init_data: str) -> Optional[Dict]:
         """
         Validate Telegram WebApp initData and extract user info
         """
         if not settings.TELEGRAM_BOT_TOKEN:
-            logger.warning("TELEGRAM_BOT_TOKEN not configured, using mock validation")
-            return self._mock_validate_telegram_init_data(init_data)
+            if settings.DEBUG:
+                return self._mock_validate_telegram_init_data(init_data)
+            raise AuthenticationFailed("Telegram auth misconfigured")
         
         try:
             # Parse init_data
@@ -119,7 +132,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
                 'photo_url': user_data.get('photo_url'),
                 'is_premium': user_data.get('is_premium', False),
             }
-            
+        
         except Exception as e:
             logger.error(f"Error validating Telegram init_data: {str(e)}")
             return None
@@ -169,8 +182,9 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             
             # Update profile if needed
             update_fields = []
-            if profile.telegram_username != telegram_user.get('username'):
-                profile.telegram_username = telegram_user.get('username')
+            username = telegram_user.get('username') or f"tg_{telegram_id}"
+            if profile.telegram_username != username:
+                profile.telegram_username = username
                 update_fields.append('telegram_username')
             
             if update_fields:

@@ -9,6 +9,7 @@ import logging
 
 from core.authentication import TelegramAuthenticationBackend
 from core.models import PaymentMethod, UserProfile
+from core.permissions import IsTelegramAuthenticated
 from core.services import BundleService
 from core.serializers import BundleDefinitionSerializer
 from core.serializers import PaymentMethodSerializer, PaymentVerificationSerializer
@@ -53,7 +54,7 @@ class PaymentVerificationView(APIView):
     Handle payment verification for bundle purchase
     """
     authentication_classes = [TelegramAuthenticationBackend]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
     
     def post(self, request):
         serializer = PaymentVerificationSerializer(data=request.data)

@@ -7,7 +7,7 @@ from rest_framework import status
 from rest_framework_simplejwt.views import TokenRefreshView
 from core.authentication import TelegramAuthenticationBackend
 from core.serializers import TelegramAuthResponseSerializer, UserSerializer
-from core.permissions import IsTelegramJWT
+from core.permissions import IsTelegramAuthenticated
 
 
 class TelegramLoginView(APIView):
@@ -46,7 +46,7 @@ class MeView(APIView):
     Verify JWT and return current user.
     """
 
-    permission_classes = [IsAuthenticated, IsTelegramJWT]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
 
     def get(self, request):
         return Response(UserSerializer(request.user).data)
