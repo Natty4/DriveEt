@@ -216,7 +216,7 @@ class PaymentVerifier:
                 payer_name=f"Test User {reference[-4:]}",
                 payer_account="1234567890",
                 receiver="Exam App",
-                amount=Decimal('150.00'),
+                amount=Decimal('500.00'),
                 date="2024-01-01 10:00:00",
                 reference=reference,
                 reason="Premium Subscription"

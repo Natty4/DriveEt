@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django.core.cache import cache
 import logging
+from datetime import timedelta
 from decimal import Decimal
 
 from core.models import (
@@ -461,7 +462,7 @@ class BundleOrderService:
             # Update order with verified amount
             order.reference_number = reference_number
             order.verified_amount = result.amount
-            order.verified_at = timezone.now()
+            order.verified_at = result.date or timezone.now()
             
             # Check if amount is sufficient
             if result.amount >= order.order_amount:
@@ -545,7 +546,8 @@ class BundleOrderService:
                 # Create user bundle
                 user_bundle = UserBundle.objects.create(
                     user=order.user,
-                    bundle_definition=order.bundle_definition
+                    bundle_definition=order.bundle_definition,
+                    expiry_date = timezone.now() + timedelta(days=order.bundle_definition.validity_days)
                 )
                 
                 # Update order
