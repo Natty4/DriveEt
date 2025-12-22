@@ -199,11 +199,9 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
             reference_number=serializer.validated_data['reference_number']
         )
         
-        response_serializer = PaymentVerificationResponseSerializer(data=result)
-        if response_serializer.is_valid():
-            return Response(response_serializer.data)
-        else:
-            return Response(result, status=status.HTTP_200_OK)
+        serializer = PaymentVerificationResponseSerializer(result)
+        # return Response(serializer.data)
+        return Response(result, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['post'])
     def accept_suggestion(self, request):

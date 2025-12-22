@@ -15,6 +15,7 @@ from core.models import (
     BundlePurchase, UserProfile, BundleOrder, OrderBundleSuggestion,
     PaymentMethod,
 )
+from core.serializers import BundleOrderSerializer, UserBundleSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -472,12 +473,13 @@ class BundleOrderService:
                 # Complete the order (create bundle)
                 completion_result = BundleOrderService.complete_order(order.id)
                 
+
                 return {
                     'success': True,
                     'status': 'completed',
                     'message': 'Payment verified and bundle activated!',
-                    'order': order,
-                    'bundle': completion_result.get('bundle'),
+                    'order': BundleOrderSerializer(order).data,
+                    'bundle': UserBundleSerializer(completion_result.get('bundle')).data,
                     'remaining_resources': completion_result.get('remaining_resources')
                 }
             else:
