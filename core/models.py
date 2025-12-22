@@ -1252,7 +1252,7 @@ class BundleOrder(models.Model):
     def save(self, *args, **kwargs):
         if not self.expires_at:
             from django.utils import timezone
-            self.expires_at = timezone.now() + timezone.timedelta(hours=24)  # 24-hour expiry
+            self.expires_at = timezone.now() + timezone.timedelta(hours=48)  # 48-hour expiry
         super().save(*args, **kwargs)
     
     @property

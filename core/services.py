@@ -3,6 +3,7 @@
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
+from django.utils.timezone import make_aware, is_naive
 from rest_framework import status
 from rest_framework.response import Response
 from django.core.cache import cache
@@ -261,7 +262,7 @@ class BundleService:
         resources['bundle_name'] = bundle.bundle_definition.name
         resources['bundle_code'] = bundle.bundle_definition.code
         resources['has_unlimited_road_sign_quiz'] = bundle.has_unlimited_road_sign_quiz
-        
+        logger.info("Resources : ", resources)
         return resources
     
     @staticmethod
@@ -463,7 +464,12 @@ class BundleOrderService:
             # Update order with verified amount
             order.reference_number = reference_number
             order.verified_amount = result.amount
-            order.verified_at = result.date or timezone.now()
+            
+
+            verified_at = result.date
+            if verified_at and is_naive(verified_at):
+                verified_at = make_aware(verified_at)
+            order.verified_at = verified_at or timezone.now()
             
             # Check if amount is sufficient
             if result.amount >= order.order_amount:
