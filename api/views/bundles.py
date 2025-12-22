@@ -130,6 +130,7 @@ class BundlePurchaseViewSet(viewsets.ModelViewSet):
     def resources(self, request):
         """Get user's resource status"""
         resources = BundleService.get_user_resources(request.user)
+        print(resources, '----------------------')
         return Response(resources)
     
     
