@@ -130,7 +130,6 @@ class BundlePurchaseViewSet(viewsets.ModelViewSet):
     def resources(self, request):
         """Get user's resource status"""
         resources = BundleService.get_user_resources(request.user)
-        print(resources, '----------------------')
         return Response(resources)
     
     
@@ -190,8 +189,6 @@ class BundleOrderViewSet(viewsets.ModelViewSet):
         serializer = VerifyPaymentRequestSerializer(data=request.data)
         
         if not serializer.is_valid():
-            print(request.data, '-------------- 1 -')
-            print(serializer.errors, '-------------- 2 -')
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         # Verify payment

@@ -52,7 +52,7 @@ MIDDLEWARE = [
     # 'core.middleware.access_control.SubscriptionAccessMiddleware',
     # 'core.middleware.access_control.UsageTrackingMiddleware',
     # 'core.middleware.tier_access.TierAccessMiddleware',
-    # 'core.middleware.access_control.AccessControlMiddleware',
+    'core.middleware.access_control.AccessControlMiddleware',
 ]
 
 ROOT_URLCONF = "config.urls"
