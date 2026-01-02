@@ -1,0 +1,73 @@
+# core/serializers/question.py
+from rest_framework import serializers
+from core.models import (
+    Question, QuestionTranslation, AnswerChoice, AnswerChoiceTranslation,
+    Explanation, ExplanationTranslation
+)
+from .base import AllTranslationsMixin
+from .roadsign import RoadSignSerializer
+from .category import QuestionCategorySerializer
+
+class AnswerChoiceSerializer(serializers.ModelSerializer, AllTranslationsMixin):
+    translations = serializers.SerializerMethodField()
+    road_sign_option = RoadSignSerializer(read_only=True)
+
+    class Meta:
+        model = AnswerChoice
+        fields = ['id', 'translations', 'road_sign_option', 'is_correct', 'order']
+
+    def get_translations(self, obj):
+        return self.get_translations_dict(
+            obj,
+            obj.translations.all(),
+            fields=['text']
+        )
+
+
+class ExplanationSerializer(serializers.ModelSerializer, AllTranslationsMixin):
+    translations = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Explanation
+        fields = ['translations', 'media_url', 'media_type']
+
+    def get_translations(self, obj):
+        return self.get_translations_dict(
+            obj,
+            obj.translations.all(),
+            fields=['detail']
+        )
+
+
+class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
+    translations = serializers.SerializerMethodField()
+    choices = AnswerChoiceSerializer(many=True, read_only=True)
+    explanation = ExplanationSerializer(read_only=True)
+    associated_road_sign = RoadSignSerializer(read_only=True)
+    effective_image_url = serializers.SerializerMethodField()
+    category = QuestionCategorySerializer(read_only=True)
+
+    class Meta:
+        model = Question
+        fields = [
+            'id', 'question_type', 'translations', 'choices',
+            'explanation', 'associated_road_sign', 'effective_image_url',
+            'difficulty', 'category'
+        ]
+
+    def get_translations(self, obj):
+        return self.get_translations_dict(
+            obj,
+            obj.translations.all(),
+            fields=['content']
+        )
+
+    def get_effective_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.associated_road_sign and obj.associated_road_sign.image:
+            return request.build_absolute_uri(obj.associated_road_sign.image.url)
+        elif obj.media_image:
+            return request.build_absolute_uri(obj.media_image.url)
+        return None
+    
+    

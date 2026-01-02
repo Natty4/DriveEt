@@ -1,0 +1,17 @@
+django-filter 
+django-phonenumber-field 
+phonenumbers 
+drf-yasg 
+psycopg2-binary 
+python-jose 
+python-dotenv 
+django-extensions 
+gunicorn
+PyJWT
+qrcode
+djangorestframework-simplejwt
+django-cors-headers
+Pillow
+dj-database-url
+whitenoise
+django-import-export
