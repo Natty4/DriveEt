@@ -1,5 +1,4 @@
 # core/models.py
-
 import enum
 import uuid
 
@@ -517,7 +516,6 @@ class ExamTranslation(models.Model):
     language = models.CharField(max_length=10, choices=Language.choices())
     title = models.CharField(max_length=200)
     description = models.TextField()
-    # Add other fields if needed (e.g., description)
     
     class Meta:
         unique_together = ['exam', 'language']
