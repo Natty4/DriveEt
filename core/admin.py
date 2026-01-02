@@ -153,21 +153,12 @@ class ExamGeneratorForm(forms.Form):
     title_am = forms.CharField(max_length=200, label="Title (Amharic)")
     title_ti = forms.CharField(max_length=200, label="Title (Tigrinya)", required=False)
     title_or = forms.CharField(max_length=200, label="Title (Oromiffa)", required=False)
-    
-    difficulty = forms.ChoiceField(choices=[('', 'Any'), ('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')])
+
+    difficulty = forms.ChoiceField(
+        choices=[('', 'Any'), ('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')]
+    )
     question_count = forms.IntegerField(min_value=10, max_value=100, initial=50)
     is_free = forms.BooleanField(required=False, label="Free Exam")
-
-    # Dynamic category + type + count
-    categories = QuestionCategory.objects.annotate(question_count=Count('questions'))
-    for cat in categories:
-        field_name = f"cat_{cat.code}_count"
-        locals()[field_name] = forms.IntegerField(
-            label=f"{cat.code} ({cat.question_count} available)",
-            min_value=0,
-            initial=0,
-            required=False
-        )
 
     question_type = forms.MultipleChoiceField(
         choices=Question.QuestionType.choices,
@@ -175,6 +166,23 @@ class ExamGeneratorForm(forms.Form):
         required=False,
         label="Question Types"
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # SAFE: DB access only after Django is fully ready
+        categories = QuestionCategory.objects.annotate(
+            question_count=Count('questions')
+        )
+
+        for cat in categories:
+            field_name = f"cat_{cat.code}_count"
+            self.fields[field_name] = forms.IntegerField(
+                label=f"{cat.code} ({cat.question_count} available)",
+                min_value=0,
+                initial=0,
+                required=False
+            )
     
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):

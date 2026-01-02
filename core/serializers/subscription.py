@@ -40,9 +40,7 @@ class SubscriptionTierSerializer(serializers.ModelSerializer, AllTranslationsMix
         if obj.ad_free:
             features.append("Ad-Free Experience")
         return features
-        
-
-    
+         
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
