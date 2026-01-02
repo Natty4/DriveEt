@@ -20,7 +20,7 @@ class SubscriptionTierAdmin(admin.ModelAdmin):
     search_fields = ('translations__name',)
     list_filter = ('price', 'duration_days', 'full_road_sign_quiz')
     inlines = [SubscriptionTierTranslationInline]
-    filter_horizontal = ('exams',)
+    # filter_horizontal = ('exams',)
 
     def display_name(self, obj):
         return obj.display_name
