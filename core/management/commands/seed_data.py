@@ -14,7 +14,10 @@ from core.models import (
     Exam, ExamTranslation
 )
 from payment.models import PaymentMethod, PaymentMethodTranslation
-from users.models import SubscriptionTier, SubscriptionTierTranslation
+from users.models import SubscriptionTier, SubscriptionTierTranslation, UserProfile
+
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class Command(BaseCommand):
@@ -23,6 +26,18 @@ class Command(BaseCommand):
     @transaction.atomic
     def handle(self, *args, **kwargs):
         self.stdout.write("Starting complete database seeding (idempotent)...")
+        
+        # Create admin user if not exists
+        if not User.objects.filter(username='admin').exists():
+            admin = User.objects.create_superuser(
+                username='admin',
+                email='admin@example.com',
+                password='pass'
+            )
+            UserProfile.objects.create(
+                user=admin
+            )
+            self.stdout.write(self.style.SUCCESS('Admin user created.'))
 
         # ===================================================================
         # 1. Question Categories (idempotent)
