@@ -190,7 +190,7 @@ class ExamAdmin(admin.ModelAdmin):
     search_fields = ('translations__title',)
     list_filter = ('difficulty', 'is_free', 'passing_score')
     inlines = [ExamTranslationInline]
-    filter_horizontal = ('questions',)
+    # filter_horizontal = ('questions',)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
