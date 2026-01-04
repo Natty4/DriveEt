@@ -35,8 +35,8 @@ INSTALLED_APPS = [
     'import_export',
     
     # Local
-    'users',
     'core',
+    'users',
     'api',
     'payment',
 ]
