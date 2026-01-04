@@ -72,3 +72,5 @@ def get_exams_for_user(user_profile):
                 output_field=models.BooleanField()
             )
         )
+    
+    

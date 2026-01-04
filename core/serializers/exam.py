@@ -1,4 +1,5 @@
 # core/serializers/exam.py
+
 from rest_framework import serializers
 from core.models import Exam, ExamAttempt, ExamTranslation
 from .base import AllTranslationsMixin
@@ -44,34 +45,7 @@ class ExamMetadataSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             obj,
             obj.translations.all(),
             fields=['title', 'description']
-        )
-
-
-# class ExamMetadataSerializer(serializers.ModelSerializer, AllTranslationsMixin):
-#     translations = serializers.SerializerMethodField()
-#     question_count = serializers.IntegerField(read_only=True)
-#     duration_minutes = serializers.IntegerField(read_only=True)
-    # premium = serializers.BooleanField(read_only=True)  # Annotated
-    # completed = serializers.BooleanField(read_only=True)
-    # inProgress = serializers.BooleanField(read_only=True, source='in_progress')
-    # lastScore = serializers.FloatField(read_only=True, source='last_score', allow_null=True)
-    
-
-#     class Meta:
-#         model = Exam
-#         fields = [
-#             'id', 'translations', 'question_count', 'duration_minutes',
-#             'premium', 'completed', 'inProgress', 'lastScore', 'difficulty',
-            
-#         ]
-
-#     def get_translations(self, obj):
-#         return self.get_translations_dict(
-#             obj,
-#             obj.translations.all(),
-#             fields=['title', 'description']
-#         )
-        
+        )     
 
 class ExamDetailSerializer(serializers.ModelSerializer, AllTranslationsMixin):
     translations = serializers.SerializerMethodField()
@@ -87,7 +61,6 @@ class ExamDetailSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             obj.translations.all(),
             fields=['title', 'description']
         )
-
 
 class ExamAttemptSerializer(serializers.ModelSerializer):
     class Meta:

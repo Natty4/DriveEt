@@ -1,4 +1,5 @@
 # core/serializers/base.py
+
 from rest_framework import serializers
 
 class AllTranslationsMixin:

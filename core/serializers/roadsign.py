@@ -1,4 +1,5 @@
 # core/serializers/roadsign.py
+
 from rest_framework import serializers
 from core.models import RoadSign, RoadSignTranslation
 from .base import AllTranslationsMixin
@@ -21,3 +22,5 @@ class RoadSignSerializer(serializers.ModelSerializer, AllTranslationsMixin):
     def get_image_url(self, obj):
         request = self.context.get('request')
         return request.build_absolute_uri(obj.image.url) if obj.image and request else None
+    
+    

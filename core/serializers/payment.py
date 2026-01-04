@@ -1,4 +1,5 @@
-# serializers/payment.py
+# core/serializers/payment.py
+
 from rest_framework import serializers
 from payment.models import PaymentMethod, PaymentMethodTranslation, Transaction
 from .base import AllTranslationsMixin
@@ -22,3 +23,6 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = ['id', 'reference_number', 'account_last_5', 'amount', 'status', 'created_at', 'updated_at']
+        
+        
+        

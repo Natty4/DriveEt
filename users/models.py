@@ -10,11 +10,13 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from core.models import Language
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class UserProfile(models.Model):
     """User profile linked to Telegram. Links to auth User."""
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     tg_id = models.CharField(max_length=50, unique=True, db_index=True)  # Primary identifier
     tg_username = models.CharField(max_length=255, blank=True, null=True)
     tg_data = models.JSONField(default=dict, blank=True)  # Raw Telegram user data
@@ -46,7 +48,10 @@ class UserProfile(models.Model):
 
 
 class SubscriptionTier(models.Model):
-    """Defines tiers (S0 free, S1, etc.). Static config, not per-user. Acts as container for Exams."""
+    """Defines tiers (S0 free, S1, etc.). 
+        Static config, not per-user.
+        Acts as container for Exams.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     duration_days = models.PositiveIntegerField()  # e.g., 30 for 1mo

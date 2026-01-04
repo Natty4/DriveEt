@@ -1,4 +1,5 @@
 # core/models.py
+
 import enum
 import uuid
 

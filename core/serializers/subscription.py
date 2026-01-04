@@ -1,4 +1,5 @@
 # core/serializers/subscription.py
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -42,7 +43,6 @@ class SubscriptionTierSerializer(serializers.ModelSerializer, AllTranslationsMix
         return features
          
 
-
 class SubscriptionSerializer(serializers.ModelSerializer):
     tier = SubscriptionTierSerializer(read_only=True)
 
@@ -59,7 +59,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['tg_id', 'preferred_language', 'active_subscription', 'expiry_date']
         
         
-
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)
     
@@ -86,3 +85,5 @@ class TelegramAuthResponseSerializer(serializers.Serializer):
             "refresh": str(refresh),
             "user": UserSerializer(user).data,
         } 
+        
+        

@@ -1,12 +1,14 @@
-# users/services/subscription_service.py
+# core/services/subscription_service.py
+
 from django.db import transaction
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
+import logging
+
 from payment.verification import PaymentVerifier
 from payment.models import Transaction, PaymentMethod
 from users.models import Subscription, UserProfile, SubscriptionTier
-from django.core.exceptions import ValidationError
-import logging
 
 logger = logging.getLogger(__name__)
 

@@ -1,4 +1,5 @@
 # core/viewsets/content.py
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -11,8 +12,13 @@ from django.db.models import Q, Prefetch
 from core.models import (
     Exam, Question, ExamAttempt, AnswerChoice
 )
-from core.serializers.exam import ExamMetadataSerializer, ExamDetailSerializer
+from core.serializers.exam import (
+    ExamMetadataSerializer, 
+    ExamDetailSerializer, 
+    ExamAttemptSerializer
+)
 from core.serializers.question import QuestionSerializer
+from core.serializers.exam_attempt import ExamAttemptDetailSerializer
 from core.permissions import (
     IsTelegramAuthenticated,
     HasActiveSubscription,
@@ -20,14 +26,11 @@ from core.permissions import (
 )
 from core.utils.exam_utils import get_exams_for_user
 from core.utils.subscription_utils import can_access_exam
-from core.responses import APIResponse  # Use standardized response
-
+from core.responses import APIResponse
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
-test_user = User.objects.get(id=1)
 class ContentViewSet(viewsets.ViewSet):
-    # permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
+    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -35,7 +38,7 @@ class ContentViewSet(viewsets.ViewSet):
     # 1. Dashboard: List of available exams
     @action(detail=False, methods=['get'])
     def my_exams(self, request):
-        exams_qs = get_exams_for_user(test_user.profile)
+        exams_qs = get_exams_for_user(request.user.profile)
         serializer = ExamMetadataSerializer(
             exams_qs,
             many=True,
@@ -46,7 +49,7 @@ class ContentViewSet(viewsets.ViewSet):
     # 2. Single Exam Detail — Fixed & Improved
     @action(detail=True, methods=['get'], url_path='exam')
     def exam_detail(self, request, pk=None):
-        profile = test_user.profile
+        profile = request.user.profile
         exam = get_object_or_404(Exam, id=pk)
 
         # Use unified access checker
@@ -80,10 +83,10 @@ class ContentViewSet(viewsets.ViewSet):
     # 3. Offline Sync: All Exams
     @action(detail=False, methods=['get'], url_path='exams/all')
     def all_exams_offline(self, request):
-        if not test_user.profile.is_subscribed():
+        if not request.user.profile.is_subscribed():
             return APIResponse.forbidden("Active subscription required for offline sync.")
 
-        profile = test_user.profile
+        profile = request.user.profile
         exams = Exam.objects.filter(
             tiers__subscription__user_profile=profile,
             tiers__subscription__expiry_date__gt=timezone.now()
@@ -110,7 +113,7 @@ class ContentViewSet(viewsets.ViewSet):
             Q(category__code='SIGN') | Q(associated_road_sign__isnull=False)
         ).distinct()
 
-        profile = test_user.profile
+        profile = request.user.profile
         is_full_access = (
             profile.is_subscribed() and
             profile.active_subscription.tier.full_road_sign_quiz
@@ -147,7 +150,7 @@ class ContentViewSet(viewsets.ViewSet):
             )
 
         exam = get_object_or_404(Exam, id=exam_id)
-        profile = test_user.profile
+        profile = request.user.profile
 
         if not can_access_exam(profile, exam):
             return APIResponse.forbidden(
@@ -183,7 +186,8 @@ class ContentViewSet(viewsets.ViewSet):
             "total_questions": len(answers),
             "attempt_id": str(attempt.id)
         })
-        
+    
+    # 6. Reset Exam Attempts    
     @action(detail=False, methods=['delete'], url_path='reset_attempt')
     def reset_attempt(self, request):
         """
@@ -195,12 +199,13 @@ class ContentViewSet(viewsets.ViewSet):
         profile = request.user.profile
         exam_id = request.data.get('exam_id')
         reset_all = request.data.get('all', False) or exam_id is None
-        exams_qs = get_exams_for_user(test_user.profile)
+        exams_qs = get_exams_for_user(request.user.profile)
         
         if reset_all:
             # Bulk reset: all non-deleted attempts for this user
             
-            attempts_qs = exams_qs.filter(
+            attempts_qs = ExamAttempt.filter(
+                user_profile=request.user.profile,
                 deleted_at__isnull=True
             )
 
@@ -250,4 +255,48 @@ class ContentViewSet(viewsets.ViewSet):
                     "reset_at": timezone.now().isoformat()
                 }
             )    
-        
+    
+    # 7. Exam Attempts list
+    @action(detail=False, methods=['get'], url_path='my_exam_attempts')
+    def my_exam_attempts(self, request):
+        """
+        Get detailed exam attempts.
+        - ?exam_id=<uuid>: Single attempt for that exam
+        - No param: All attempts for user's active subscription
+        Only non-deleted attempts
+        """
+        # profile = request.user.profile
+        profile = request.user.profile
+        exam_id = request.query_params.get('exam_id')
+
+        if not profile.is_subscribed():
+            return APIResponse.error(
+                message="Active subscription required to view attempts.",
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+
+        # Base QS: User's attempts for active subscription exams
+        attempts_qs = ExamAttempt.objects.filter(
+            user_profile=profile,
+            deleted_at__isnull=True,
+            exam__tiers__subscription__user_profile=profile,
+            exam__tiers__subscription__expiry_date__gt=timezone.now()
+        ).select_related('exam').prefetch_related(
+            'exam__questions', 'exam__questions__choices'
+        ).distinct()
+
+        if exam_id:
+            # Single exam attempt
+            attempt = get_object_or_404(attempts_qs, exam_id=exam_id)
+            serializer = ExamAttemptDetailSerializer(attempt, context=self.get_serializer_context())
+            return APIResponse.success(data=serializer.data)
+
+        else:
+            # All attempts
+            serializer = ExamAttemptDetailSerializer(
+                attempts_qs.order_by('-start_time'),
+                many=True,
+                context=self.get_serializer_context()
+            )
+            return APIResponse.success(data=serializer.data)
+

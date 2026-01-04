@@ -1,4 +1,5 @@
 # core/viewsets/payment.py
+
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,11 +16,9 @@ logger = logging.getLogger(__name__)
 
 from django.contrib.auth import get_user_model
 
-User = get_user_model()
-test_user = User.objects.get(id=1)
 
 class PaymentViewSet(viewsets.ViewSet):
-    # permission_classes = [IsTelegramAuthenticated]
+    permission_classes = [IsTelegramAuthenticated]
 
     @action(detail=False, methods=['get'])
     def methods(self, request):
@@ -53,7 +52,7 @@ class PaymentViewSet(viewsets.ViewSet):
 
         try:
             transaction_obj = SubscriptionService.activate_via_payment(
-                user_profile=test_user.profile,
+                user_profile=request.user.profile,
                 tier_id=tier_id,
                 payment_method_id=payment_method_id,
                 reference_number=reference_number,
@@ -65,7 +64,7 @@ class PaymentViewSet(viewsets.ViewSet):
                 data={
                     "transaction": transaction_serializer.data,
                     "subscription_active": True,
-                    "expiry_date": test_user.profile.expiry_date.isoformat(),
+                    "expiry_date": request.user.profile.expiry_date.isoformat(),
                     "tier": {
                         "id": transaction_obj.subscription_tier.id,
                         "name": transaction_obj.subscription_tier.display_name
@@ -80,7 +79,7 @@ class PaymentViewSet(viewsets.ViewSet):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
-            logger.exception(f"Unexpected error in purchase for user {test_user.profile.tg_username}")
+            logger.exception(f"Unexpected error in purchase for user {request.user.profile.tg_username}")
             return APIResponse.error(
                 message="An unexpected error occurred. Please contact support if the issue persists.",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -89,10 +88,13 @@ class PaymentViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def transactions(self, request):
         transactions = Transaction.objects.filter(
-            user_profile=test_user.profile
+            user_profile=request.user.profile
         ).select_related('subscription_tier', 'payment_method').order_by('-created_at')
 
         serializer = TransactionSerializer(transactions, many=True)
         return APIResponse.success(data=serializer.data)
+    
+    
+    
     
     

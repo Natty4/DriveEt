@@ -1,4 +1,5 @@
 # config/settings.py
+
 import os
 import dotenv
 from pathlib import Path
@@ -149,8 +150,6 @@ MOCK_PAYMENT_VERIFICATION = os.getenv('PAYMENT_MOCK_MODE', 'True') == 'True'
 PAYMENT_CURRENCY = os.getenv('PAYMENT_CURRENCY', '')
 
 
-
-
 # Security
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -162,9 +161,6 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     
-    
-
-
 
 # REST Framework Configuration - TEMPORARY FOR TESTING
 REST_FRAMEWORK = {
@@ -199,7 +195,6 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50,
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
 }
-
 
 
 # JWT Configuration

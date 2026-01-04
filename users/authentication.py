@@ -1,16 +1,20 @@
-# core/authentication.py
+# users/authentication.py
+
 import json
 import hmac
 import hashlib
 import urllib.parse
 import base64
 from datetime import datetime
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from django.conf import settings
-from django.contrib.auth.models import User
 from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
 import logging
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +25,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
     Validates Telegram WebApp init_data passed via Authorization header
     """
     
-    def authenticate(self, request) -> Optional[Tuple[User, None]]:
+    def authenticate(self, request) -> Optional[Tuple["User", None]]:
         """
         Authenticate user using Telegram Mini App init_data
         Header format: Authorization: TMA <init_data>

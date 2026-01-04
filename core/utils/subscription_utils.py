@@ -1,4 +1,5 @@
 # core/utils/subscription_utils.py
+
 from django.utils import timezone
 from django.db.models import Q
 from core.models import Exam
@@ -21,3 +22,5 @@ def can_access_exam(user_profile, exam: Exam) -> bool:
         subscription__expiry_date__gt=timezone.now(),
         subscription__is_active=True
     ).exists()
+    
+    
