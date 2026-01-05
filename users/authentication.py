@@ -181,7 +181,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
         
         try:
             # Try to find existing user by tg_id in profile
-            from core.models import UserProfile
+            from users.models import UserProfile
             profile = UserProfile.objects.select_related('user').get(tg_id=tg_id)
             
             # Update profile if needed
@@ -211,7 +211,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             )
             
             # Create UserProfile
-            from core.models import UserProfile
+            from users.models import UserProfile
             UserProfile.objects.create(
                 user=user,
                 tg_id=tg_id,
