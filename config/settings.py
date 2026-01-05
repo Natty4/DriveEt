@@ -35,10 +35,10 @@ INSTALLED_APPS = [
     'import_export',
     
     # Local
-    'core',
-    'users',
-    'api',
-    'payment',
+    'users.apps.UsersConfig',
+    'core.apps.CoreConfig',
+    'payment.apps.PaymentConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
