@@ -17,13 +17,14 @@ class ExamMetadataSerializer(serializers.ModelSerializer, AllTranslationsMixin):
     best_score = serializers.FloatField(source='annotated_best_score', read_only=True)
     premium = serializers.BooleanField(read_only=True)
     completed = serializers.BooleanField(read_only=True)
+    timestamp = serializers.DateTimeField(read_only=True)
     inProgress = serializers.BooleanField(read_only=True, source='in_progress')
     lastScore = serializers.SerializerMethodField()
 
     class Meta:
         model = Exam
         fields = ['id', 'translations', 'difficulty', 'duration_minutes',
-                  'question_count', 'status', 'best_score',
+                  'question_count', 'status', 'best_score', 'timestamp',
                   'premium', 'completed', 'inProgress', 'lastScore'
                   ]
 

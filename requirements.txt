@@ -8,9 +8,11 @@ whitenoise>=6.6
 django-filter 
 django-phonenumber-field 
 phonenumbers 
-drf-yasg  
+drf-yasg 
+psycopg2-binary 
 python-jose 
-django-extensions
+django-extensions 
+gunicorn
 PyJWT
 qrcode
 djangorestframework-simplejwt

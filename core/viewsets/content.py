@@ -29,6 +29,7 @@ from core.utils.subscription_utils import can_access_exam
 from core.responses import APIResponse
 from django.contrib.auth import get_user_model
 
+
 class ContentViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
 

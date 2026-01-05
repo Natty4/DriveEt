@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 from django.contrib.auth import get_user_model
 
 
+
 class PaymentViewSet(viewsets.ViewSet):
     permission_classes = [IsTelegramAuthenticated]
 

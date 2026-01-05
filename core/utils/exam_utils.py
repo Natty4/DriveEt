@@ -70,6 +70,10 @@ def get_exams_for_user(user_profile):
                 When(is_free=False, then=Value(True)),
                 default=Value(False),
                 output_field=models.BooleanField()
+            ),
+            timestamp = Max(
+                'attempts__end_time',
+                filter=Q(attempts__user_profile=user_profile)
             )
         )
     

@@ -13,6 +13,7 @@ from core.permissions import IsTelegramAuthenticated
 from core.responses import APIResponse
 
 from django.contrib.auth import get_user_model
+
 class SubscriptionViewSet(viewsets.ViewSet):
     permission_classes = [IsTelegramAuthenticated]
 
