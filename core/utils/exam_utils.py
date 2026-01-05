@@ -4,7 +4,8 @@ from django.utils import timezone
 from django.db import models
 from django.db.models import Case, When, Max, Q, Value, CharField
 from django.db.models.functions import Round
-from core.models import Exam, ExamAttempt
+from core.models import Exam
+from users.models import ExamAttempt
 
 def get_exams_for_user(user_profile):
     """

@@ -1,11 +1,12 @@
 # core/serializers/exam_attempt.py
 
 from rest_framework import serializers
-from core.models import ExamAttempt, Question, AnswerChoice
+from core.models import Question, AnswerChoice
 from core.serializers.question import (
     QuestionSerializer,
     AnswerChoiceSerializer
 )
+from users.models import ExamAttempt
 from core.serializers.exam import ExamDetailSerializer
 
 class ExamAttemptDetailSerializer(serializers.ModelSerializer):

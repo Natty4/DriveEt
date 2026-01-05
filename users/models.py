@@ -1,17 +1,20 @@
 # users/models.py
-
+import enum
 import uuid
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from core.models import Exam, AnswerChoice
+from common.constants import Language
 
-from core.models import Language
 from django.contrib.auth import get_user_model
 User = get_user_model()
+
+
 
 
 class UserProfile(models.Model):
@@ -137,4 +140,78 @@ class SubscriptionTierTranslation(models.Model):
     def __str__(self):
         return f"{self.tier.id} - {self.get_language_display()}: {self.name}"
     
-    
+class ExamAttempt(models.Model):
+    class Status(models.TextChoices):
+        STARTED = 'STARTED', _('Started')
+        COMPLETED = 'COMPLETED', _('Completed')
+        ABANDONED = 'ABANDONED', _('Abandoned')
+
+    id = models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4, 
+        editable=False
+    )
+    user_profile = models.ForeignKey(
+        UserProfile, 
+        on_delete=models.CASCADE, 
+        related_name='attempts'
+    )
+    exam = models.ForeignKey(
+        Exam, 
+        on_delete=models.CASCADE, 
+        related_name='attempts'
+    )
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(null=True)
+    score = models.DecimalField(
+        max_digits=4,        # allows 100.0
+        decimal_places=1,
+        null=True,
+        blank=True,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(100),
+        ]
+    ) # Calculated server-side
+    is_passed = models.BooleanField(null=True)  # Computed based on score >= exam.passing_score
+    raw_answers_json = models.JSONField(default=dict)  # {question_id: choice_id}
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.STARTED)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    class Meta:
+        verbose_name = _("Exam Attempt")
+        verbose_name_plural = _("Exam Attempts")
+        # unique_together = ['user_profile', 'exam']  # One attempt per exam per user
+        indexes = [
+            models.Index(fields=['user_profile', 'status']),
+            models.Index(fields=['deleted_at']),
+        ]
+
+    def calculate_score(self):
+        """Server-side score calculation with pass/fail."""
+        if not self.raw_answers_json:
+            return
+        correct_count = 0
+        for q_id, c_id in self.raw_answers_json.items():
+            try:
+                choice = AnswerChoice.objects.get(id=c_id, question_id=q_id)
+                if choice.is_correct:
+                    correct_count += 1
+            except AnswerChoice.DoesNotExist:
+                pass  # Invalid answer, count as wrong
+        total_questions = len(self.raw_answers_json)
+        self.score = (correct_count / total_questions * 100) if total_questions else 0
+        self.is_passed = self.score >= self.exam.passing_score
+        self.status = self.Status.COMPLETED
+        self.end_time = timezone.now()
+        self.save()
+        
+    def delete(self, *args, **kwargs):
+        """Override delete to soft-delete"""
+        self.deleted_at = timezone.now()
+        self.status = self.Status.ABANDONED
+        self.save()
+
+    def hard_delete(self, *args, **kwargs):
+        """For admin use only"""
+        super().delete(*args, **kwargs)
+   

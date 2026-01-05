@@ -1,7 +1,8 @@
 # core/serializers/exam.py
 
 from rest_framework import serializers
-from core.models import Exam, ExamAttempt, ExamTranslation
+from core.models import Exam, ExamTranslation
+from users.models import ExamAttempt
 from .base import AllTranslationsMixin
 from .question import QuestionSerializer
 from decimal import Decimal, ROUND_HALF_UP

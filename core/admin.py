@@ -16,9 +16,9 @@ from core.models import (
     Question, QuestionTranslation,
     AnswerChoice, AnswerChoiceTranslation,
     Explanation, ExplanationTranslation,
-    Exam, ExamTranslation,
-    ExamAttempt
+    Exam, ExamTranslation
 )
+from users.models import ExamAttempt
 
 # Custom filter for subscription expiry
 class ExpiryStatusFilter(SimpleListFilter):

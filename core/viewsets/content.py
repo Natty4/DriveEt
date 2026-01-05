@@ -10,8 +10,10 @@ from django.utils import timezone
 from django.db.models import Q, Prefetch
 
 from core.models import (
-    Exam, Question, ExamAttempt, AnswerChoice
+    Exam, Question, 
+    AnswerChoice
 )
+from users.models import ExamAttempt
 from core.serializers.exam import (
     ExamMetadataSerializer, 
     ExamDetailSerializer, 
