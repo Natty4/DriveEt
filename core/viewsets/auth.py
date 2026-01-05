@@ -87,8 +87,16 @@ class TelegramLoginView(APIView):
             profile.save(update_fields=['active_subscription', 'expiry_date'])
 
         # Build JWT response
-        data = TelegramAuthResponseSerializer.build(user)
-        return Response(data, status=status.HTTP_200_OK)
+        payload = TelegramAuthResponseSerializer.build(user)
+
+        return Response(
+            {
+                "success": True,
+                "message": "success",
+                "data": payload,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class TelegramTokenRefreshView(TokenRefreshView):
