@@ -40,15 +40,15 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
         
         try:
             # Parse and validate Telegram init_data
-            telegram_user = self.validate_telegram_init_data(init_data)
-            if not telegram_user:
+            tg_user = self.validate_telegram_init_data(init_data)
+            if not tg_user:
                 raise AuthenticationFailed('Invalid Telegram authentication data')
             
             # Get or create user
-            user, created = self.get_or_create_user(telegram_user)
+            user, created = self.get_or_create_user(tg_user)
             
             if created:
-                logger.info(f"New user created via Telegram: {telegram_user.get('username')}")
+                logger.info(f"New user created via Telegram: {tg_user.get('username')}")
             else:
                 logger.debug(f"User authenticated via Telegram: {user.username}")
             
@@ -56,7 +56,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
                     user,
                     {
                         "source": "telegram",
-                        "tg_id": telegram_user["id"],
+                        "tg_id": tg_user["id"],
                     }
                 )
         
@@ -173,11 +173,11 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
                 'is_premium': False,
             }
     
-    def get_or_create_user(self, telegram_user: Dict) -> Tuple[User, bool]:
+    def get_or_create_user(self, tg_user: Dict) -> Tuple[User, bool]:
         """
         Get or create Django user from Telegram user data
         """
-        tg_id = telegram_user['id']
+        tg_id = tg_user['id']
         
         try:
             # Try to find existing user by tg_id in profile
@@ -186,7 +186,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             
             # Update profile if needed
             update_fields = []
-            username = telegram_user.get('username') or f"tg_{tg_id}"
+            username = tg_user.get('username') or f"tg_{tg_id}"
             if profile.tg_username != username:
                 profile.tg_username = username
                 update_fields.append('tg_username')
@@ -198,9 +198,9 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             
         except UserProfile.DoesNotExist:
             # Create new user
-            username = telegram_user.get('username') or f"telegram_{tg_id}"
-            first_name = telegram_user.get('first_name', '')
-            last_name = telegram_user.get('last_name', '')
+            username = tg_user.get('username') or f"telegram_{tg_id}"
+            first_name = tg_user.get('first_name', '')
+            last_name = tg_user.get('last_name', '')
             
             # Create Django User
             user = User.objects.create(
@@ -215,8 +215,8 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             UserProfile.objects.create(
                 user=user,
                 tg_id=tg_id,
-                tg_username=telegram_user.get('username'),
-                telegram_data=telegram_user
+                tg_username=tg_user.get('username'),
+                tg_data=tg_user
             )
             user._fresh_login = True  # Temporary attribute
             return user, True

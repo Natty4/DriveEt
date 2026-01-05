@@ -1,6 +1,6 @@
 # core/admin.py
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils import timezone
 from django.utils.html import format_html
 from django.shortcuts import render, redirect
@@ -131,15 +131,75 @@ class QuestionTranslationInline(admin.StackedInline):
 
 @admin.register(Question)
 class QuestionAdmin(ImportExportMixin, admin.ModelAdmin):
-    list_display = ('id', 'category', 'question_type', 'difficulty', 'associated_road_sign', 'created_at')
-    list_filter = ('question_type', 'difficulty', 'category', 'created_at')
-    search_fields = ('id', 'translations__content', 'associated_road_sign__code')
+    list_display = (
+        'id',
+        'category',
+        'question_type',
+        'difficulty',
+        'is_premium',
+        'associated_road_sign',
+        'created_at',
+    )
+    list_filter = (
+        'question_type',
+        'difficulty',
+        'category',
+        'is_premium',
+        'created_at',
+    )
+    search_fields = (
+        'id',
+        'translations__content',
+        'associated_road_sign__code',
+    )
     inlines = [
         QuestionTranslationInline,
         AnswerChoiceInline,
-        ExplanationInline
+        ExplanationInline,
     ]
     readonly_fields = ('created_at', 'updated_at')
+
+    actions = ['make_premium', 'make_free']
+
+    # --------------------
+    # Admin Actions
+    # --------------------
+
+    @admin.action(description="Mark selected questions as PREMIUM")
+    def make_premium(self, request, queryset):
+        if not queryset.exists():
+            self.message_user(
+                request,
+                "No questions selected.",
+                level=messages.WARNING,
+            )
+            return
+
+        updated = queryset.exclude(is_premium=True).update(is_premium=True)
+
+        self.message_user(
+            request,
+            f"{updated} question(s) successfully marked as PREMIUM.",
+            level=messages.SUCCESS,
+        )
+
+    @admin.action(description="Mark selected questions as FREE")
+    def make_free(self, request, queryset):
+        if not queryset.exists():
+            self.message_user(
+                request,
+                "No questions selected.",
+                level=messages.WARNING,
+            )
+            return
+
+        updated = queryset.exclude(is_premium=False).update(is_premium=False)
+
+        self.message_user(
+            request,
+            f"{updated} question(s) successfully marked as FREE.",
+            level=messages.SUCCESS,
+        )
 
 # === Exam ===
 class ExamTranslationInline(admin.StackedInline):
