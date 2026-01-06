@@ -92,7 +92,7 @@ class TelegramLoginView(APIView):
         return Response(
             {
                 "success": True,
-                "message": "success",
+                "message": "Login successful",
                 "data": payload,
             },
             status=status.HTTP_200_OK,

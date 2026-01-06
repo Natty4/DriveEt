@@ -7,11 +7,18 @@ class IsTelegramAuthenticated(BasePermission):
     def has_permission(self, request, view):
         auth = request.auth
         user = request.user
+
         if not auth or not user or not user.is_authenticated:
             return False
+
+        # Safe access to profile
+        profile = getattr(user, "profile", None)
+        if not profile:
+            return False
+
         return (
             auth.get("source") == "telegram"
-            and auth.get("tg_id") == getattr(user.profile.tg_id, None, None)
+            and str(auth.get("tg_id")) == str(profile.tg_id)
         )
 
 
