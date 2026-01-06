@@ -8,8 +8,10 @@ import base64
 from datetime import datetime
 from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from django.conf import settings
+from django.db import transaction, IntegrityError
 from rest_framework import authentication
 from rest_framework.exceptions import AuthenticationFailed
+
 import logging
 
 from django.contrib.auth import get_user_model
@@ -175,51 +177,64 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
     
     def get_or_create_user(self, tg_user: Dict) -> Tuple[User, bool]:
         """
-        Get or create Django user from Telegram user data
+        Get or create Django user from Telegram user data (atomic).
+        If any step fails, NOTHING is created.
         """
-        tg_id = tg_user['id']
-        
+        from users.models import UserProfile
+        tg_id = tg_user["id"]
+
         try:
-            # Try to find existing user by tg_id in profile
-            from users.models import UserProfile
-            profile = UserProfile.objects.select_related('user').get(tg_id=tg_id)
-            
-            # Update profile if needed
-            update_fields = []
-            username = tg_user.get('username') or f"tg_{tg_id}"
-            if profile.tg_username != username:
-                profile.tg_username = username
-                update_fields.append('tg_username')
-            
-            if update_fields:
-                profile.save(update_fields=update_fields)
-            
-            return profile.user, False
-            
-        except UserProfile.DoesNotExist:
-            # Create new user
-            username = tg_user.get('username') or f"telegram_{tg_id}"
-            first_name = tg_user.get('first_name', '')
-            last_name = tg_user.get('last_name', '')
-            
-            # Create Django User
-            user = User.objects.create(
-                username=username,
-                first_name=first_name,
-                last_name=last_name,
-                is_active=True
-            )
-            
-            # Create UserProfile
-            from users.models import UserProfile
-            UserProfile.objects.create(
-                user=user,
-                tg_id=tg_id,
-                tg_username=tg_user.get('username'),
-                tg_data=tg_user
-            )
-            user._fresh_login = True  # Temporary attribute
-            return user, True
+            with transaction.atomic():
+
+                profile = (
+                    UserProfile.objects
+                    .select_for_update()
+                    .select_related("user")
+                    .filter(tg_id=tg_id)
+                    .first()
+                )
+
+                if profile:
+                    username = tg_user.get("username") or f"tg_{tg_id}"
+                    updated = False
+
+                    if profile.tg_username != username:
+                        profile.tg_username = username
+                        updated = True
+
+                    if updated:
+                        profile.save(update_fields=["tg_username"])
+
+                    return profile.user, False
+                
+                username = tg_user.get("username") or f"telegram_{tg_id}"
+
+                user = User.objects.create(
+                    username=username,
+                    first_name=tg_user.get("first_name", ""),
+                    last_name=tg_user.get("last_name", ""),
+                    is_active=True,
+                )
+
+                UserProfile.objects.create(
+                    user=user,
+                    tg_id=tg_id,
+                    tg_username=tg_user.get("username"),
+                    tg_data=tg_user,
+                )
+
+                user._fresh_login = True
+                return user, True
+
+        except IntegrityError as e:
+            # Guaranteed rollback
+            logger.error("Telegram user creation integrity error", exc_info=e)
+            raise AuthenticationFailed("User creation failed, please retry")
+
+        except Exception as e:
+            # Guaranteed rollback
+            logger.exception("Unexpected error during Telegram user creation")
+            raise AuthenticationFailed("Authentication failed")
            
         
         
