@@ -55,7 +55,7 @@ class Command(BaseCommand):
                 'ti': "ስርዓተ ትራፊክን መምርሕታትን",
                 'or': "Seerota Fi Qajeelfama Tirafikaa"
             },
-            'VEHICLE_TECH': {
+            'VEHICLE': {
                 'en': "Vehicle Technical Knowledge",
                 'am': "የተሽከርካሪ ቴክኒክ እውቀት",
                 'ti': "ፍልጠት ቴክኒክ ተሽከርካሪ",
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                 'ti': "ሓለዋ እግረኛን ብሽክለታን",
                 'or': "Nagaa Namoota Miillaa Fi Biskileetii"
             },
-            'LEGAL_PENALTY': {
+            'LEGAL': {
                 'en': "Offenses & Penalties",
                 'am': "ጥፋቶች እና ቅጣቶች",
                 'ti': "ጥሕሰታትን ቅፅዓታትን",
