@@ -424,7 +424,7 @@ class Command(BaseCommand):
                 "or": "Mallattoo kennuu margaa kana yeroo argitu maal gochuu qabda?"
             },
             {
-                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "medium",
                 "en": "What is the legal blood alcohol concentration (BAC) limit for drivers in Ethiopia?",
                 "am": "በኢትዮጵያ ለአሽከርካሪዎች የሕጋዊ የደም አልኮል መጠን (BAC) ገደብ ስንት ነው?",
                 "ti": "ንመካይድታት ኢትዮጵያ ዘሎ ሕጋዊ ደም ኣልኮሆል መጠን (BAC) ገደብ እንታይ እዩ?",
@@ -466,7 +466,7 @@ class Command(BaseCommand):
                 "or": "Mallattoon kamtu hojjettoota mana barumsaa dhiyaatu jiru itti hima?"
             },
             {
-                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "medium",
                 "en": "What documents must you always carry while driving in Ethiopia?",
                 "am": "በኢትዮጵያ የሚገኙበት ጊዜ ሁልጊዜ መያዝ ያለብዎት ሰነዶች ምንድን ናቸው?",
                 "ti": "ኣብ ኢትዮጵያ ምስ ትመካይድ ኩሉ ግዜ ክትሕዝ ዘለካ ወረቐታት ኣንታይ እዮም?",
@@ -508,7 +508,7 @@ class Command(BaseCommand):
                 "or": "Mallattoon 'Bishaan Waa'uu Hin Dandeenye' kun maal jechuudha?"
             },
             {
-                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "hard",
+                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "hard",
                 "en": "What is the penalty for driving without a valid license in Ethiopia?",
                 "am": "በኢትዮጵያ ውስጥ ያልተፈቀደ ፈቃድ ያለው መንዳት የሚያስከትለው ቅጣት ምንድን ነው?",
                 "ti": "ብዘይሕጋዊ ፈቃድ ምንዳድ ኣብ ኢትዮጵያ ዘለዎ መግሻ እንታይ እዩ?",
@@ -550,7 +550,7 @@ class Command(BaseCommand):
                 "or": "Mallattoon kamtu dhoqqeen dhiigdu danda'an itti hima?"
             },
             {
-                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "medium",
                 "en": "What is the minimum age for obtaining a driver's license in Ethiopia?",
                 "am": "በኢትዮጵያ የአሽከርካሪ ፈቃድ ለማግኘት ዝቅተኛው ዕድሜ ስንት ነው?",
                 "ti": "ንፈቃድ መካይድታት ኣብ ኢትዮጵያ ንምርካብ ዝተሓጐሰ ዕድመ እንታይ እዩ?",
@@ -592,7 +592,7 @@ class Command(BaseCommand):
                 "or": "Mallattoon bineensa karaa darbuu kun hojjettoota waa'ee maalitti hima?"
             },
             {
-                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "hard",
+                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "hard",
                 "en": "What should you do if you are involved in a minor traffic accident?",
                 "am": "በትንሽ የትራፊክ አደጋ ውስጥ ከተካተቱ ምን ማድረግ አለብዎት?",
                 "ti": "ኣብ ንእሽቶ ሓደጋ ትራፊክ እንተኣተልካ እንታይ ክትገብር ይግባእ?",
