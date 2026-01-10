@@ -149,49 +149,159 @@ class Command(BaseCommand):
                 }
             },
             {
-                "code": "YIELD_001",
+                "code": "YIELD_002",
                 "image": "road_signs/yield.png",
                 "category": rs_cat_objs['REGULATORY'],
                 "translations": {
-                    "en": {"name": "Yield", "meaning": "Give way to other traffic", "detailed_explanation": "Slow down and be ready to stop if necessary to let other vehicles pass."},
-                    "am": {"name": "መብት ስጡ", "meaning": "ለሌላ ተሽከርካሪ መብት ይስጡ", "detailed_explanation": "ቀስ በበሉ እና አስፈላጊ ከሆነ ሌሎች ተሽከርካሪዎች እንዲያልፉ ለመቆም ይዘጋጁ።"},
-                    "ti": {"name": "ኣፍቅሩ", "meaning": "ካልእ ተሽከርካሪ ቅድሚያ ሃቡ", "detailed_explanation": "ቀስ ብበሉን ኣብ ዘድልየሉ እዋን ካልእ ተሽከርካሪ ክሳጠር ንኽእትዉ ደው ክትብሉ ይዳሎ።"},
-                    "or": {"name": "Kennuu", "meaning": "Margaa biraa kennuu", "detailed_explanation": "Suuta dhaabi jedhuun of eeggadhu fi mooraa biraa dabarsuuf barbaachise dhaabuu."}
+                    "en": {"name": "Yield", "meaning": "Give right of way", "detailed_explanation": "Drivers must slow down and give way to traffic on the intersecting road."},
+                    "am": {"name": "መንገድ ስጥ", "meaning": "የመንገድ መብት ስጥ", "detailed_explanation": "አሽከርካሪዎች ፍጥነታቸውን ማለት እና ለመሻገሪያ መንገድ ላይ ለሚገኙ ተሽከርካሪዎች መንገድ ማስተላለፍ አለባቸው።"},
+                    "ti": {"name": "መገዲ ሃብ", "meaning": "መሰል መገዲ ሃብ", "detailed_explanation": "ኣካይዳታት ቅልጡፍነቶም ክንክኑ ኣብ ዘጋጥም መገዲ ዘለዉ መካይድታት መገዲ ክህቡ ይግባእ።"},
+                    "or": {"name": "Kennee", "meaning": "Karaa kennuu", "detailed_explanation": "Hojjettootni saffisa isaanii hir’isuufi karaa garagaraa irra jiran hojjettootaaf karaa kennuu qabu."}
                 }
             },
             {
-                "code": "SPEED_50",
-                "image": "road_signs/speed_50.png",
+                "code": "NOENTRY_003",
+                "image": "road_signs/no_entry.png",
                 "category": rs_cat_objs['REGULATORY'],
                 "translations": {
-                    "en": {"name": "Speed Limit 50", "meaning": "Maximum speed is 50 km/h", "detailed_explanation": "Do not exceed 50 km/h in this zone."},
-                    "am": {"name": "ፍጥነት ገደብ 50", "meaning": "ከፍተኛው ፍጥነት 50 ኪ.ሜ/ሰ ነው", "detailed_explanation": "በዚህ ቀጠና ከ50 ኪ.ሜ/ሰ አይበልጥም።"},
-                    "ti": {"name": "ፍጥነት ገደብ 50", "meaning": "ዝለዓለ ፍጥነት 50 ኪሎሜትር/ሰዓት", "detailed_explanation": "ኣብዚ ዞባ ካብ 50 ኪሎሜትር/ሰዓት ኣይትበልጽ።"},
-                    "or": {"name": "Safuu 50", "meaning": "Safuu ol aanaa 50 km/h", "detailed_explanation": "Naannoo kana keessatti 50 km/h irra caaluu hin qabu."}
+                    "en": {"name": "No Entry", "meaning": "Entry prohibited", "detailed_explanation": "Vehicles are not allowed to enter this road or area."},
+                    "am": {"name": "መግቢያ የለም", "meaning": "መግቢያ አልባ", "detailed_explanation": "ተሽከርካሪዎች ወደዚህ መንገድ ወይም አካባቢ መግባት አይፈቀድም።"},
+                    "ti": {"name": "እታው ኣይተኣትው", "meaning": "እታው ኣይፍቀድ", "detailed_explanation": "መካይድታት ናብዚ መገዲ ወይ ከባቢ ክኣትዉ ኣይፍቀድን።"},
+                    "or": {"name": "Seentuun Hin Dandeenye", "meaning": "Seentuun hin eegin", "detailed_explanation": "Makiinaaleen karaa ykn naannoo kana seenuu hin danda'an."}
                 }
             },
             {
-                "code": "NO_HORN",
+                "code": "SPEED40_004",
+                "image": "road_signs/speed_limit_40.png",
+                "category": rs_cat_objs['REGULATORY'],
+                "translations": {
+                    "en": {"name": "Speed Limit 40", "meaning": "Maximum speed 40 km/h", "detailed_explanation": "Do not exceed 40 kilometers per hour in this area."},
+                    "am": {"name": "ፍጥነት ገደብ 40", "meaning": "ከፍተኛ ፍጥነት ሰአት 40 ኪ.ሜ.", "detailed_explanation": "በዚህ አካባቢ በሰዓት 40 ኪሎሜትር ከመቶ በላይ አትሽከረክር።"},
+                    "ti": {"name": "ልምዲ ቅልጡፍ 40", "meaning": "ዝለዓለ ቅልጡፍ ሰዓት 40 ኪ.ሜ.", "detailed_explanation": "ኣብዚ ከባቢ ካብ 40 ኪሎሜትር በሰዓት ክቕጽል ኣይፍቀድን።"},
+                    "or": {"name": "Saffisa Hir'ina 40", "meaning": "Saffisa guddaan sa'aatii 40 km", "detailed_explanation": "Naannoo kana keessatti sa'aatii kilomiitira 40 irra hin ol yaalin."}
+                }
+            },
+            {
+                "code": "NOSOUND_005",
                 "image": "road_signs/no_horn.png",
                 "category": rs_cat_objs['REGULATORY'],
                 "translations": {
-                    "en": {"name": "No Horn", "meaning": "Honking is prohibited", "detailed_explanation": "Do not use your horn in this area."},
-                    "am": {"name": "ሆርን አትጠቀሙ", "meaning": "ሆርን መጫን የተከለከለ ነው", "detailed_explanation": "በዚህ አካባቢ ሆርን አይጠቀሙ።"},
-                    "ti": {"name": "ሆርን ኣይትጥቀሙ", "meaning": "ሆርን መጠቀም ዝተከልከለ", "detailed_explanation": "ኣብዚ ከባቢ ሆርን ኣይትጥቀሙ።"},
-                    "or": {"name": "Hojii Hin Gochuu", "meaning": "Hojii gochuu dhorkame", "detailed_explanation": "Naannoo kana keessatti hojii gochuu hin danda'amu."}
+                    "en": {"name": "No Horn", "meaning": "Horn prohibited", "detailed_explanation": "Do not sound your horn in this area, typically near hospitals or schools."},
+                    "am": {"name": "ሾጣጣ አይጫወት", "meaning": "ሾጣጣ መጫወት አይፈቀድም", "detailed_explanation": "በዚህ አካባቢ ሾጣጣዎን አትጫወቱ (በተለምዶ በሆስፒታሎች ወይም በትምህርት ቤቶች አቅራቢያ)።"},
+                    "ti": {"name": "በትሪ ኣይጭወት", "meaning": "በትሪ ምጭዋት ኣይፍቀድ", "detailed_explanation": "ኣብዚ ከባቢ በትሪኻ ኣይጭወት (መብዛሕትኡ ግዜ ኣብ ወተሃደራት ወይ ቤት ትምህርቲ ኣብ ዚርከብ)።"},
+                    "or": {"name": "Bishaan Waa'uu Hin Dandeenye", "meaning": "Faanaa hin waa'in", "detailed_explanation": "Naannoo kana keessatti faanaa keessan hin waa'ina (xiqqoo ispoortaalaa ykn mana barumsaa irra jiru)."}
                 }
             },
             {
-                "code": "PEDESTRIAN",
-                "image": "road_signs/pedestrian.png",
+                "code": "PEDXING_006",
+                "image": "road_signs/pedestrian_crossing.png",
                 "category": rs_cat_objs['WARNING'],
                 "translations": {
-                    "en": {"name": "Pedestrian Crossing", "meaning": "Pedestrians may be crossing", "detailed_explanation": "Be prepared to stop for pedestrians."},
-                    "am": {"name": "የእግረኛ መሻገሪያ", "meaning": "እግረኞች ሊያቋሽጡ ይችላሉ", "detailed_explanation": "ለእግረኞች ለመቆም ይዘጋጁ።"},
-                    "ti": {"name": "መሻገሪ እግረኛ", "meaning": "እግረኛታት ክሳጠሩ ይኽእሉ", "detailed_explanation": "ንእግረኛታት ንደው ክትብሉ ይዳሎ።"},
-                    "or": {"name": "Ce'umsaa Namootaa", "meaning": "Namoonni marga ce'uun danda'u", "detailed_explanation": "Namoota margaa ce'uuf of eeggadhu."}
+                    "en": {"name": "Pedestrian Crossing", "meaning": "Watch for pedestrians", "detailed_explanation": "Pedestrians may be crossing the road. Slow down and be prepared to stop."},
+                    "am": {"name": "መንገድ ከማቸው", "meaning": "መንገድ ከማሾችን ተጠንቀቅ", "detailed_explanation": "መንገድ ከማሾች መንገዱን ሊያቋርጡ ይችላሉ። ፍጥነትዎን ይቀንሱ እና ለመቆም ዝግጁ ይሁኑ።"},
+                    "ti": {"name": "መጻኢ መንገዲ", "meaning": "ንእግር ተጓዓዝቲ ተጠንቀቕ", "detailed_explanation": "እግር ተጓዓዝቲ መገዲ ክሰግሩ ይኽእሉ እዮም። ቅልጡፍነትኻ ኣንክል ንምቁጽጻር ድማ ተዳለው።"},
+                    "or": {"name": "Karaa Darbii Piidoo", "meaning": "Piidoo karaa darban ilaali", "detailed_explanation": "Piidootni karaa darbuu danda'u. Saffisa keessan hir'saa dhaabuuuf qophaa'aa."}
                 }
             },
+            {
+                "code": "SCHOOL_007",
+                "image": "road_signs/school_zone.png",
+                "category": rs_cat_objs['WARNING'],
+                "translations": {
+                    "en": {"name": "School Zone", "meaning": "School area ahead", "detailed_explanation": "Drive slowly and carefully. Children may be crossing the road."},
+                    "am": {"name": "የትምህርት ቤት ዞን", "meaning": "የትምህርት ቤት አካባቢ ፊት ለፊት", "detailed_explanation": "በዝግታ እና በጥንቃቄ ይግዙ። ልጆች መንገዱን ሊያቋርጡ ይችላሉ።"},
+                    "ti": {"name": "ዞን ቤት ትምህርቲ", "meaning": "ከባቢ ቤት ትምህርቲ ኣብ ቅድሚ ገጽ", "detailed_explanation": "ቀስ ኢልካ ብጥንቃቐ ግደ። ህጻናት መገዲ ክሰግሩ ይኽእሉ እዮም።"},
+                    "or": {"name": "Naannoo Mana Barumsaa", "meaning": "Mana barumsaa fuuldura", "detailed_explanation": "Saffisaa fi eegginaan hojjedhaa. Ijoolleen karaa darbuu danda'u."}
+                }
+            },
+            {
+                "code": "ANIMALS_008",
+                "image": "road_signs/animals_crossing.png",
+                "category": rs_cat_objs['WARNING'],
+                "translations": {
+                    "en": {"name": "Animal Crossing", "meaning": "Animals may cross road", "detailed_explanation": "Watch for domestic or wild animals crossing the road, especially in rural areas."},
+                    "am": {"name": "እንስሳት መሻገር", "meaning": "እንስሳት መንገድ ሊያቋርጡ ይችላሉ", "detailed_explanation": "ቤተሰብ ወይም ዱር እንስሳት መንገድ ማቋረጫ ተጠንቀቁ (በተለይ በገጠር አካባቢዎች)።"},
+                    "ti": {"name": "መስጊር እንስሳ", "meaning": "እንስሳታት መገዲ ክሰግሩ ይኽእሉ", "detailed_explanation": "ንቤት እንስሳታት ወይ እንስሳ በረኻ መገዲ ምስግራ ተጠንቀቕ (መብዛሕትኡ ግዜ ኣብ ገጠራዊ ከባቢ)።"},
+                    "or": {"name": "Bineensa Karaa Darbuu", "meaning": "Bineensonni karaa darbuu danda'u", "detailed_explanation": "Mana ykn bineensa bosonaa karaa darban ilaali (addunyaa naannoo baadiyyaa keessatti)."}
+                }
+            },
+            {
+                "code": "HAIRPIN_009",
+                "image": "road_signs/hairpin_curve.png",
+                "category": rs_cat_objs['WARNING'],
+                "translations": {
+                    "en": {"name": "Hairpin Curve", "meaning": "Sharp double curve ahead", "detailed_explanation": "Extremely sharp curve ahead, usually in mountainous areas. Reduce speed significantly."},
+                    "am": {"name": "ጠባይ ጥጥ መዞሪያ", "meaning": "ከፍተኛ ሾጣጣ መዞሪያ ፊት ለፊት", "detailed_explanation": "ከፍተኛ ሾጣጣ መዞሪያ ፊት ለፊት (በተለምዶ በተራራማ አካባቢዎች)። ፍጥነትዎን በከፍተኛ ሁኔታ ይቀንሱ።"},
+                    "ti": {"name": "ጸሊም መጠወሪ", "meaning": "በሊሕ ክልተ ክፍሊ መጠወሪ ኣብ ቅድሚ ገጽ", "detailed_explanation": "ኣዝዩ በሊሕ መጠወሪ ኣብ ቅድሚ ገጽ (መብዛሕትኡ ግዜ ኣብ ከባቢ ኣኽራን)። ቅልጡፍነትኻ ብዙሕ ኣንክል።"},
+                    "or": {"name": "Qalloo Cimaa", "meaning": "Qalloo cimaa fuuldura", "detailed_explanation": "Qalloo cimaa fuuldura (yeroo baay'ee naannoo gaarreen). Saffisa gadi dhiisaa."}
+                }
+            },
+            {
+                "code": "FALLROCK_010",
+                "image": "road_signs/falling_rocks.png",
+                "category": rs_cat_objs['WARNING'],
+                "translations": {
+                    "en": {"name": "Falling Rocks", "meaning": "Risk of falling rocks", "detailed_explanation": "Area prone to rockfalls, especially during rainy season or in mountainous regions."},
+                    "am": {"name": "የሚወድቁ አልቃሻዎች", "meaning": "የአልቃሻ መውደቅ አደጋ", "detailed_explanation": "አልቃሻዎች ሊወድቁ የሚችሉበት አካባቢ (በተለይ በዝናብ ወቅት ወይም በተራራማ ክልሎች)።"},
+                    "ti": {"name": "ዝወድቁ እምኒ", "meaning": "ሓደጋ እምኒ ምውዳቕ", "detailed_explanation": "እምኒ ክወድቁ ዝኽእሉት ከባቢ (መብዛሕትኡ ግዜ ኣብ ወቕቲ ዝናብ ወይ ኣብ ከባቢ ኣኽራን)።"},
+                    "or": {"name": "Dhoqqeen Dhiigdu", "meaning": "Dhoqqeen dhiigduu hatattamaa", "detailed_explanation": "Naannoo dhoqqeen dhiigdu (yeroo baay'ee yeroa rooba ykn naannoo gaarreen)."}
+                }
+            },
+            {
+                "code": "PARKING_011",
+                "image": "road_signs/parking.png",
+                "category": rs_cat_objs['INFORMATIVE'],
+                "translations": {
+                    "en": {"name": "Parking Area", "meaning": "Designated parking zone", "detailed_explanation": "Area where vehicles can be parked legally. Check for time restrictions if any."},
+                    "am": {"name": "መኪና ማቆሚያ", "meaning": "የተወሰነ መኪና ማቆሚያ አካባቢ", "detailed_explanation": "ተሽከርካሪዎች በሕጋዊ ሁኔታ ሊቆሙበት የሚችሉበት አካባቢ። ጊዜ ገደቦች ካሉ ያረጋግጡ።"},
+                    "ti": {"name": "ከባቢ መቐመጢ መኪና", "meaning": "ተወሰነ ከባቢ መቐመጢ መኪና", "detailed_explanation": "ከባቢ መካይድታት ብሕጋዊ መገዲ ክቐመጡሉ ዝኽእሉት እዩ። እንተኾነ ግዜ ገደባት ኣለዉ ንርአ።"},
+                    "or": {"name": "Naannoo Kuufama", "meaning": "Naannoo kuufama murtaa'e", "detailed_explanation": "Naannoo makiinaaleen seeraan kuufamuu danda'an. Yoo ciccimoo yeroon jiraate mirkaneessi."}
+                }
+            },
+            {
+                "code": "HOSPITAL_012",
+                "image": "road_signs/hospital.png",
+                "category": rs_cat_objs['INFORMATIVE'],
+                "translations": {
+                    "en": {"name": "Hospital Ahead", "meaning": "Hospital in vicinity", "detailed_explanation": "Hospital facility nearby. Drive quietly and be prepared for ambulance traffic."},
+                    "am": {"name": "ፊት ለፊት ሆስፒታል", "meaning": "ሆስፒታል አቅራቢያ", "detailed_explanation": "ሆስፒታል በአቅራቢያ አለ። በሰላም ይግዙ እና ለአምቡላንስ ተሽከርካሪ ዝግጁ ይሁኑ።"},
+                    "ti": {"name": "ሆስፒታል ኣብ ቅድሚ ገጽ", "meaning": "ሆስፒታል ኣብ ጥቓ", "detailed_explanation": "ሆስፒታል ኣብ ጥቓ ኣሎ። ብህድኣት ግደ ንምንቅስቓስ ኣምቡላንስ ድማ ተዳለው።"},
+                    "or": {"name": "Mana Yaalaa Fuuldura", "meaning": "Mana yaalaa dhiyoo", "detailed_explanation": "Mana yaalaa dhiyoo jira. Nagaan hojjedhaa fi makiinaa yaalaaf qophaa'aa."}
+                }
+            },
+            {
+                "code": "FUEL_013",
+                "image": "road_signs/fuel_station.png",
+                "category": rs_cat_objs['INFORMATIVE'],
+                "translations": {
+                    "en": {"name": "Fuel Station", "meaning": "Gasoline/petrol station ahead", "detailed_explanation": "Fuel filling station available for refueling vehicles."},
+                    "am": {"name": "የነዳጅ ጣብያ", "meaning": "የበንዚን/ፔትሮል ጣብያ ፊት ለፊት", "detailed_explanation": "የነዳጅ መሙያ ጣብያ ለተሽከርካሪዎች ነዳጅ ለመሙላት ይገኛል።"},
+                    "ti": {"name": "መደበር ነዳጂ", "meaning": "መደበር በንዚን/ፔትሮል ኣብ ቅድሚ ገጽ", "detailed_explanation": "መደበር ምምላእ ነዳጂ ንመካይድታት ነዳጂ ንምምላእ ኣሎ።"},
+                    "or": {"name": "Mana Bittaa Naftaa", "meaning": "Mana bittaa naftaa fuuldura", "detailed_explanation": "Mana bittaa naftaa makiinaaleef naftaa guutuu irratti argama."}
+                }
+            },
+            {
+                "code": "RESTAREA_014",
+                "image": "road_signs/rest_area.png",
+                "category": rs_cat_objs['INFORMATIVE'],
+                "translations": {
+                    "en": {"name": "Rest Area", "meaning": "Place to stop and rest", "detailed_explanation": "Designated area for drivers to take breaks, especially on long journeys."},
+                    "am": {"name": "የዕረፍት አካባቢ", "meaning": "ለመቆም እና ለመዝለል ቦታ", "detailed_explanation": "አሽከርካሪዎች ለመዝለል የሚቆሙበት ቦታ (በተለይ በረጅም ጉዞዎች)።"},
+                    "ti": {"name": "ከባቢ ዕረፍቲ", "meaning": "ቦታ ንምቁም ንምዕረፍ", "detailed_explanation": "ተወሰነ ቦታ ንኣካይዳታት ንኼዕርፉ (መብዛሕትኡ ግዜ ኣብ ነዊሕ ጕዕዞ)።"},
+                    "or": {"name": "Naannoo Boqonnaa", "meaning": "Bakka dhaabuu fi boqonnaa", "detailed_explanation": "Naannoo murtaa'e hojjettootaaf boqonnaa fudhachuuf (yeroo baay'ee imala dheeressa)."}
+                }
+            },
+            {
+                "code": "ROUNDABT_015",
+                "image": "road_signs/roundabout.png",
+                "category": rs_cat_objs['INFORMATIVE'],
+                "translations": {
+                    "en": {"name": "Roundabout Ahead", "meaning": "Circular intersection ahead", "detailed_explanation": "Prepare to enter a circular intersection. Give way to vehicles already in the roundabout."},
+                    "am": {"name": "ዙር ክብ መገናኛ", "meaning": "ክብ መገናኛ ፊት ለፊት", "detailed_explanation": "ለክብ መገናኛ መግባት ይዘጋጁ። በዙር ክብ መገናኛው ውስጥ ለሚገኙ ተሽከርካሪዎች መንገድ ስጡ።"},
+                    "ti": {"name": "ዙር ክብ መገናኒ ኣብ ቅድሚ ገጽ", "meaning": "ክብ መገናኒ ኣብ ቅድሚ ገጽ", "detailed_explanation": "ንክብ መገናኒ ንኽትኣትዉ ተዳለዉ። ንመካይድታት ኣብቲ ዙር ክብ መገናኒ ዘለዉ መገዲ ሃቡ።"},
+                    "or": {"name": "Walqunnamtii Geengoo Fuuldura", "meaning": "Walqunnamtii geengoo fuuldura", "detailed_explanation": "Walqunnamtii geengoo seenuur qophaa'aa. Makiinaaleen walqunnamtii geengoo keessa jiran kennuu."}
+                }
+            }
         ]
 
         sign_objs = []
@@ -300,20 +410,6 @@ class Command(BaseCommand):
                 "or": "Mallattoon kamtu ce'umsaa namootaa dursee jiraachuu agarsiisa?"
             },
             {
-                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "medium",
-                "en": "What is the maximum speed limit in urban areas in Ethiopia?",
-                "am": "በኢትዮጵያ በከተማ ውስጥ ከፍተኛው ፍጥነት ገደብ ስንት ነው?",
-                "ti": "ኣብ ኢትዮጵያ ኣብ ከተማ ዝለዓለ ፍጥነት ገደብ መንእዩ?",
-                "or": "Itiyoophiyaa keessatti magaala keessatti ol aanaa safuu baay'ina ciicannoo maalidha?"
-            },
-            {
-                "type": "IT", "cat": "SIGN", "sign": sign_objs[1], "img": None, "diff": "easy",
-                "en": "What should you do when you see this sign?",
-                "am": "ይህን ምልክት ሲያዩ ምን ማድረግ አለብዎት?",
-                "ti": "እዚ ምልክት ምስ ትርእዩ እንታይ ክትገብሩ ይግባእ?",
-                "or": "Mallattoo kana argite yoom maal gochuu qabda?"
-            },
-            {
                 "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "hard",
                 "en": "When must you use your headlights during the day?",
                 "am": "በቀን ውስጥ የፊት መብራቶችዎን መቼ መጠቀም አለብዎት?",
@@ -321,75 +417,208 @@ class Command(BaseCommand):
                 "or": "Guyyaa keessatti ifa mooraa kee yoom fayyadamuu qabda?"
             },
             {
-                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "medium",
-                "en": "Who has the right of way at an uncontrolled intersection?",
-                "am": "በቁጥጥር ያልተደረገበት መገናኛ ላይ መብት ያለው ማን ነው?",
-                "ti": "ኣብ መገናኒ ቁጽጽር ዘይብሉ መብት መን እዩ?",
-                "or": "Walqunnamtii qabuun hin qabne keessatti eenyu qaba?"
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[1], "img": None, "diff": "easy",
+                "en": "What should you do when you see this yield sign?",
+                "am": "ይህን የመንገድ መተው ምልክት ሲመለከቱ ምን ማድረግ አለብዎት?",
+                "ti": "እዚ መንገዲ ምህባት ምልክት ምስርኢ እንታይ ክትገብሩ ይግባእ?",
+                "or": "Mallattoo kennuu margaa kana yeroo argitu maal gochuu qabda?"
+            },
+            {
+                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "en": "What is the legal blood alcohol concentration (BAC) limit for drivers in Ethiopia?",
+                "am": "በኢትዮጵያ ለአሽከርካሪዎች የሕጋዊ የደም አልኮል መጠን (BAC) ገደብ ስንት ነው?",
+                "ti": "ንመካይድታት ኢትዮጵያ ዘሎ ሕጋዊ ደም ኣልኮሆል መጠን (BAC) ገደብ እንታይ እዩ?",
+                "or": "Daangaawwan dhiigaa alkoolii (BAC) seeraa hojjettootaaf Itiyoophiyaa keessatti meeqa?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/speed_limit_60.png", "diff": "easy",
+                "en": "What is the maximum speed allowed where this sign is posted?",
+                "am": "ይህ ምልክት በተቀመጠበት ቦታ ከፍተኛው የሚፈቀደው ፍጥነት ስንት ነው?",
+                "ti": "እዚ ምልክት ኣብ ዘሎ ቦታ ዝፍቀድ ዝለዓለ ቅልጡፍ እንታይ እዩ?",
+                "or": "Mallattoon kun bakka dhaabame irratti saffisa guddaan fudhatamu meeqa?"
+            },
+            {
+                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "medium",
+                "en": "How often should you check your vehicle's tire pressure?",
+                "am": "የመኪናዎ ጎማ ግፊት ምን ያህል ጊዜ መፈተሽ አለብዎት?",
+                "ti": "መካይድኻ ጎማ ጸቕጢ ክንታይ ሳዕ ክትርግጽ ይግባእ?",
+                "or": "Sa'aatii meeqaaf ujummaa xurii makiinaa keetii mirkaneessuu qabda?"
             },
             {
                 "type": "IT", "cat": "SIGN", "sign": sign_objs[2], "img": None, "diff": "easy",
-                "en": "What is the speed limit shown on this sign?",
-                "am": "በዚህ ምልክት ላይ የተጠቀሰው ፍጥነት ገደብ ስንት ነው?",
-                "ti": "ኣብዚ ምልክት ዝተጠቅሰ ፍጥነት ገደብ መንእዩ?",
-                "or": "Mallattoo kana irratti safuu baay'ina ciicannoo kam agarsiisa?"
+                "en": "What does this 'No Entry' sign indicate?",
+                "am": "ይህ 'መግቢያ የለም' ምልክት ምን ያመለክታል?",
+                "ti": "እዚ 'እታው ኣይተኣትው' ምልክት እንታይ ይኣመልክት?",
+                "or": "Mallattoon 'Seentuun Hin Dandeenye' kun maal agarsiisa?"
             },
             {
-                "type": "TT", "cat": "PEDESTRIAN", "sign": None, "img": None, "diff": "medium",
-                "en": "When should you yield to pedestrians?",
-                "am": "እግረኞችን መብት መስጠት መቼ ነው?",
-                "ti": "ንእግረኛታት መብት ክትህቡ መቼ እዩ?",
-                "or": "Namoonni margaa yoom kennuu qabda?"
-            },
-            {
-                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/no_entry.png", "diff": "easy",
-                "en": "Which sign means 'No Entry'?",
-                "am": "የትኛው ምልክት 'መግባት ክልል' ማለት ነው?",
-                "ti": "መንታ ምልክት 'መግባት ክልል' ማለት እዩ?",
-                "or": "Mallattoon kamtu 'Seenuun Hin Danda’amu' jechuudha?"
-            },
-            {
-                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "hard",
-                "en": "What should you do if your vehicle starts to skid?",
-                "am": "ተሽከርካሪዎ መንሸራተት ከጀመረ ምን ማድረግ አለብዎት?",
-                "ti": "ተሽከርካሪኻ እንተተንስሓረ እንታይ ክትገብር ይግባእ?",
-                "or": "Mooraa kee yoo jalqabe yoom maal gochuu qabda?"
-            },
-            {
-                "type": "IT", "cat": "SIGN", "sign": sign_objs[3], "img": None, "diff": "medium",
-                "en": "What does this sign prohibit?",
-                "am": "ይህ ምልክት ምንን ይከለክላል?",
-                "ti": "እዚ ምልክት እንታይ ይከላኸል?",
-                "or": "Mallattoon kun eenyu dhorkaa?"
-            },
-            {
-                "type": "TT", "cat": "RULES", "sign": None, "img": None, "diff": "easy",
-                "en": "At a roundabout, who has priority?",
-                "am": "በመጠገቢያ ክብ ውስጥ መብት ያለው ማን ነው?",
-                "ti": "ኣብ መጠገቢያ ክብ መብት መን እዩ?",
-                "or": "Qubee margaa keessatti eenyu qaba?"
+                "type": "TT", "cat": "SAFETY", "sign": None, "img": None, "diff": "hard",
+                "en": "What should you do first if your vehicle starts skidding on a wet road?",
+                "am": "መኪናዎ በርጋጋ መንገድ ላይ ሲንሸራሸር መጀመሪያ ምን ማድረግ አለብዎት?",
+                "ti": "መካይድኻ ኣብ ርጋጋ መገዲ ምስተንሸራሸር ቀዳም እንታይ ክትገብር ይግባእ?",
+                "or": "Makiinaan kee daandii bishaan qabdu irratti yoo dhisuu jalqabe jalqaba maal gochuu qabda?"
             },
             {
                 "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/school_zone.png", "diff": "medium",
-                "en": "Which sign warns of a school zone ahead?",
-                "am": "የትምህርት ቤት ቀጠና መኖሩን የሚያስጠነቅቀው የትኛው ምልክት ነው?",
-                "ti": "መንታ ምልክት ቅድሚ ቤተ ትምህርቲ ከባቢ ኣመልክት?",
-                "or": "Mallattoon kamtu mana barumsaa dursee jiraachuu akeekkachiisa?"
+                "en": "Which sign warns drivers that they are approaching a school area?",
+                "am": "አሽከርካሪዎች የትምህርት ቤት አካባቢ እንደሚያጠጉ የሚጠቁም ምልክት የትኛው ነው?",
+                "ti": "ኣካይዳታት ናብ ከባቢ ቤት ትምህርቲ ከም ዝበጽሑ ዝጠቕም መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu hojjettoota mana barumsaa dhiyaatu jiru itti hima?"
             },
             {
-                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "hard",
-                "en": "What is the correct following distance on highways?",
-                "am": "በአውራ ጎዳናዎች ላይ ትክክለኛው የመከተል ርቀት ስንት ነው?",
-                "ti": "ኣብ ናይ መንገዲ ዓበይቲ ትክክለኛ ርቐት መከተት መንእዩ?",
-                "or": "Karaa mooraa guddaa irratti safuu ulfaatina yoomidha?"
+                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "en": "What documents must you always carry while driving in Ethiopia?",
+                "am": "በኢትዮጵያ የሚገኙበት ጊዜ ሁልጊዜ መያዝ ያለብዎት ሰነዶች ምንድን ናቸው?",
+                "ti": "ኣብ ኢትዮጵያ ምስ ትመካይድ ኩሉ ግዜ ክትሕዝ ዘለካ ወረቐታት ኣንታይ እዮም?",
+                "or": "Warraaqawwan yeroo hunda Itiyoophiyaa keessatti yeroo hojjetu baatu qabdu kami?"
+            },
+            {
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[3], "img": None, "diff": "easy",
+                "en": "What is the meaning of this speed limit sign?",
+                "am": "ይህ የፍጥነት ገደብ ምልክት ማለት ምን ነው?",
+                "ti": "እዚ ምልክት ልምዲ ቅልጡፍ እንታይ ማለት እዩ?",
+                "or": "Mallattoon daangaa saffisaa kun maal jechuudha?"
+            },
+            {
+                "type": "TT", "cat": "SAFETY", "sign": None, "img": None, "diff": "hard",
+                "en": "What is the recommended following distance between vehicles on highways?",
+                "am": "በተራ መንገዶች ላይ በተሽከርካሪዎች መካከል የሚመከር የመከተል ርቀት ስንት ነው?",
+                "ti": "ኣብ መንገዲ ኣውቶሞቢላት ኣብ መንገዲ ኣውቶሞቢላት መካከል ዝመከር ዝተኸተለ ርሕቀት እንታይ እዩ?",
+                "or": "Faagoo hordofuu gargaarsaa daandii gugurdoo keessatti makiinaaleen gidduu jiru meeqa?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/animals_crossing.png", "diff": "medium",
+                "en": "Which sign warns of possible animal crossings?",
+                "am": "የትኛው ምልክት ሊኖሩ የሚችሉ የእንስሳት መሻገሪያዎችን ያስጠነቅቃል?",
+                "ti": "እንስሳታት ክሰግሩ ዝኽእሉ ዝጠቕም መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu bineensonni darbuu danda'an itti hima?"
+            },
+            {
+                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "medium",
+                "en": "When should you use your hazard warning lights?",
+                "am": "የአደጋ ማስጠንቀቂያ መብራቶችዎን መቼ መጠቀም አለብዎት?",
+                "ti": "መብራህቲ ሓደጋ መቼ ክትጥቀሙ ይግባእ?",
+                "or": "Ifa ittiin himuu baalaa yoom fayyadamuu qabda?"
             },
             {
                 "type": "IT", "cat": "SIGN", "sign": sign_objs[4], "img": None, "diff": "easy",
-                "en": "What does this warning sign indicate?",
-                "am": "ይህ ማስጠንቀቂያ ምልክት ምን ያመለክታል?",
-                "ti": "እዚ ምልክት ማስጠንቀቕያ እንታይ የመልክት?",
-                "or": "Mallattoon akeekkachiisaa kun maal agarsiisa?"
+                "en": "What does this 'No Horn' sign mean?",
+                "am": "ይህ 'ሾጣጣ አይጫወት' ምልክት ማለት ምን ነው?",
+                "ti": "እዚ 'በትሪ ኣይጭወት' ምልክት እንታይ ማለት እዩ?",
+                "or": "Mallattoon 'Bishaan Waa'uu Hin Dandeenye' kun maal jechuudha?"
             },
+            {
+                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "hard",
+                "en": "What is the penalty for driving without a valid license in Ethiopia?",
+                "am": "በኢትዮጵያ ውስጥ ያልተፈቀደ ፈቃድ ያለው መንዳት የሚያስከትለው ቅጣት ምንድን ነው?",
+                "ti": "ብዘይሕጋዊ ፈቃድ ምንዳድ ኣብ ኢትዮጵያ ዘለዎ መግሻ እንታይ እዩ?",
+                "or": "Adabni Itiyoophiyaa keessatti hayyama hin qabneen hojjedhuuf kami?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/hairpin_curve.png", "diff": "hard",
+                "en": "Which sign warns of a sharp double curve ahead?",
+                "am": "ከፍተኛ ሾጣጣ መዞሪያ መኖሩን የሚያሳውቅ ምልክት የትኛው ነው?",
+                "ti": "በሊሕ ክልተ ክፍሊ መጠወሪ ኣብ ቅድሚ ዘሎ ዝኣመልክት መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu qalloo cimaa fuuldura jiru itti hima?"
+            },
+            {
+                "type": "TT", "cat": "SAFETY", "sign": None, "img": None, "diff": "medium",
+                "en": "What should you do if your brakes fail while driving downhill?",
+                "am": "በተራራ ላይ ሲወርዱ ጠቆሮችዎ ሲያልቁ ምን ማድረግ አለብዎት?",
+                "ti": "ኣብ ሸንኮራ ምስ ትወርድ ጨውረኻ ምስ ወድቁ እንታይ ክትገብር ይግባእ?",
+                "or": "Gadii yeroo deemtu yoo jiidduun dhabe maal gochuu qabda?"
+            },
+            {
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[5], "img": None, "diff": "easy",
+                "en": "What does this pedestrian crossing sign indicate?",
+                "am": "ይህ የእግረኛ መሻገሪያ ምልክት ምን ያመለክታል?",
+                "ti": "እዚ ምልክት መጻኢ መንገዲ እንታይ ይኣመልክት?",
+                "or": "Mallattoon ce'umsaa namootaa kun maal agarsiisa?"
+            },
+            {
+                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "hard",
+                "en": "What is the purpose of engine oil in your vehicle?",
+                "am": "በመኪናዎ ውስጥ የሞተር ዘይት የሚያደርገው ሥራ ምንድን ነው?",
+                "ti": "ኣብ መካይድኻ ዘይቲ ሞተር ዕላማኡ እንታይ እዩ?",
+                "or": "Kaayyoon zayitii injinii makiinaa keetii keessatti maali?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/falling_rocks.png", "diff": "medium",
+                "en": "Which sign warns of possible falling rocks?",
+                "am": "የትኛው ምልክት ሊወድቁ የሚችሉ አልቃሻዎችን ያስጠነቅቃል?",
+                "ti": "እምኒ ክወድቁ ዝኽእሉ ዝጠቕም መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu dhoqqeen dhiigdu danda'an itti hima?"
+            },
+            {
+                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "medium",
+                "en": "What is the minimum age for obtaining a driver's license in Ethiopia?",
+                "am": "በኢትዮጵያ የአሽከርካሪ ፈቃድ ለማግኘት ዝቅተኛው ዕድሜ ስንት ነው?",
+                "ti": "ንፈቃድ መካይድታት ኣብ ኢትዮጵያ ንምርካብ ዝተሓጐሰ ዕድመ እንታይ እዩ?",
+                "or": "Daangaa xiqqaa umurii hayyama hojjetuuf argachuuf Itiyoophiyaa keessatti meeqa?"
+            },
+            {
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[6], "img": None, "diff": "easy",
+                "en": "What does this school zone sign mean?",
+                "am": "ይህ የትምህርት ቤት ዞን ምልክት ማለት ምን ነው?",
+                "ti": "እዚ ምልክት ዞን ቤት ትምህርቲ እንታይ ማለት እዩ?",
+                "or": "Mallattoon naannoo mana barumsaa kun maal jechuudha?"
+            },
+            {
+                "type": "TT", "cat": "SAFETY", "sign": None, "img": None, "diff": "hard",
+                "en": "What should you do if you encounter a flooded road?",
+                "am": "በርጋጋ የተሞላ መንገድ ከተጋጠመህ ምን ማድረግ አለብህ?",
+                "ti": "መገዲ ምስ ትርእይ እንታይ ክትገብር ይግባእ?",
+                "or": "Daandii bishaan guute yoo qunnamtii argite maal gochuu qabda?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/parking.png", "diff": "easy",
+                "en": "Which sign indicates a designated parking area?",
+                "am": "የትኛው ምልክት የተወሰነ መኪና ማቆሚያ አካባቢን ያመለክታል?",
+                "ti": "ተወሰነ ከባቢ መቐመጢ መኪና ዝኣመልክት መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu naannoo kuufama murtaa'e agarsiisa?"
+            },
+            {
+                "type": "TT", "cat": "VEHICLE", "sign": None, "img": None, "diff": "medium",
+                "en": "How can you check if your vehicle's brakes are working properly?",
+                "am": "የመኪናዎ ጠቆሮች በትክክል እየሰሩ መሆናቸውን እንዴት ማረጋገጥ ይቻላል?",
+                "ti": "መካይድኻ ጨውረ ብቕንዕና ከም ዝሰርሕ ብኸመይ ከትርግጽ ትኽእል?",
+                "or": "Akkaataa mee jiidduun makiinaa kee sirriitti hojjetu mirkaneessuuf?"
+            },
+            {
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[7], "img": None, "diff": "easy",
+                "en": "What does this animal crossing sign warn drivers about?",
+                "am": "ይህ የእንስሳት መሻገሪያ ምልክት አሽከርካሪዎችን ስለ ምን ያስጠነቅቃል?",
+                "ti": "እዚ ምልክት መስጊር እንስሳ ብዛዕባ እንታይ ንመካይድታት ይጠቕም?",
+                "or": "Mallattoon bineensa karaa darbuu kun hojjettoota waa'ee maalitti hima?"
+            },
+            {
+                "type": "TT", "cat": "LAW", "sign": None, "img": None, "diff": "hard",
+                "en": "What should you do if you are involved in a minor traffic accident?",
+                "am": "በትንሽ የትራፊክ አደጋ ውስጥ ከተካተቱ ምን ማድረግ አለብዎት?",
+                "ti": "ኣብ ንእሽቶ ሓደጋ ትራፊክ እንተኣተልካ እንታይ ክትገብር ይግባእ?",
+                "or": "Yoo rakkoo xiqqoo margaa keessatti hirmaatte maal gochuu qabda?"
+            },
+            {
+                "type": "TI", "cat": "SIGN", "sign": None, "img": "questions/hospital.png", "diff": "easy",
+                "en": "Which sign indicates that a hospital is nearby?",
+                "am": "ሆስፒታል አቅራቢያ ላይ መሆኑን የሚያመለክተው የትኛው ምልክት ነው?",
+                "ti": "ሆስፒታል ኣብ ጥቓ ከም ዘሎ ዝኣመልክት መንታ ምልክት እዩ?",
+                "or": "Mallattoon kamtu mana yaalaa dhiyoo jiru agarsiisa?"
+            },
+            {
+                "type": "TT", "cat": "SAFETY", "sign": None, "img": None, "diff": "medium",
+                "en": "Why is it important to wear a seatbelt while driving?",
+                "am": "በመንዳት ጊዜ የመቀመጫ ወረቀት መልበስ ለምን አስፈላጊ ነው?",
+                "ti": "ምስ ትመካይድ ሰፊት ምልባስ ኣገዳሲ እዩ ስለምንታይ?",
+                "or": "Maaliif yeroo hojjetu uffata tiksaa uffachuu barbaachisaadha?"
+            },
+            {
+                "type": "IT", "cat": "SIGN", "sign": sign_objs[8], "img": None, "diff": "hard",
+                "en": "What should drivers do when they see this hairpin curve sign?",
+                "am": "አሽከርካሪዎች ይህንን የጠባይ ጥጥ መዞሪያ ምልክት ሲመለከቱ ምን ማድረግ አለባቸው?",
+                "ti": "መካይድታት እዚ ምልክት ጸሊም መጠወሪ ምስርኡይ እንታይ ክገብሩ ይግባኦም?",
+                "or": "Hojjettoonni mallattoo qalloo cimaa kana yeroo argitu maal gochuu qabu?"
+            }
         ]
 
         question_objs = []
@@ -443,7 +672,7 @@ class Command(BaseCommand):
                 ExplanationTranslation(explanation=exp, language='ti', detail="እዚ ትክክለኛ መልስ እዩ ምኽንያቱ ስርዓተ ትራፊክ ኢትዮጵያ ይከተል።"),
                 ExplanationTranslation(explanation=exp, language='or', detail="Kuni deebii sirrii waan ta'eef seera margaa Itiyoophiyaa kan hordofu."),
             ])
-
+        
         # ===================================================================
         # 7. Exams (3)
         # ===================================================================
