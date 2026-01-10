@@ -8,6 +8,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.translation import gettext_lazy as _
+from cloudinary.models import CloudinaryField
 from common.constants import Language
 
 
@@ -98,7 +99,13 @@ class RoadSign(models.Model):
     """Road sign model with category support"""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=50, unique=True, help_text=_("Internal code for the road sign"))
-    image = models.ImageField(upload_to='road_signs/')
+    image = CloudinaryField(
+        'image',
+        folder='road_signs/',           # Auto-creates folder
+        resource_type='image',
+        null=True,
+        blank=True
+    )
     category = models.ForeignKey(
         RoadSignCategory,
         on_delete=models.SET_NULL,
@@ -213,7 +220,14 @@ class Question(models.Model):
         verbose_name=_("Associated Road Sign"),
         help_text=_("Link to road sign if this question is specifically about one; use for sign metadata/translations")
     )
-    media_image = models.FileField('image', upload_to='questions/', null=True, blank=True)  # Added for generic images in IT questions (this will be replaced with claudinary filed)
+    media_image = CloudinaryField(
+        'image',
+        folder='questions/',
+        resource_type='image',
+        null=True,
+        blank=True,
+        help_text="Upload image for IT/TI questions"
+    )
     question_type = models.CharField(
         max_length=2,
         choices=QuestionType.choices,

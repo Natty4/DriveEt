@@ -67,12 +67,26 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             fields=['content']
         )
 
+    # def get_effective_image_url(self, obj):
+    #     request = self.context.get('request')
+    #     if obj.associated_road_sign and obj.associated_road_sign.image:
+    #         return request.build_absolute_uri(obj.associated_road_sign.image.url)
+    #     elif obj.media_image:
+    #         return request.build_absolute_uri(obj.media_image.url)
+    #     return None
+    
     def get_effective_image_url(self, obj):
-        request = self.context.get('request')
         if obj.associated_road_sign and obj.associated_road_sign.image:
-            return request.build_absolute_uri(obj.associated_road_sign.image.url)
+            url = obj.associated_road_sign.image.url
         elif obj.media_image:
-            return request.build_absolute_uri(obj.media_image.url)
-        return None
+            url = obj.media_image.url
+        else:
+            return None
+
+        # Same Cloudinary optimization
+        return url.replace(
+            '/upload/',
+            '/upload/w_400,h_400,c_fill,q_auto,f_auto/'
+        )
     
     

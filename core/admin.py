@@ -6,6 +6,8 @@ from django.utils.html import format_html
 from django.shortcuts import render, redirect
 from django.contrib.admin import SimpleListFilter
 from import_export.admin import ImportExportMixin
+from cloudinary.models import CloudinaryField
+from cloudinary.forms import CloudinaryJsFileField
 from django import forms
 from django.db.models import Count, Q
 
@@ -73,6 +75,7 @@ class RoadSignTranslationInline(admin.StackedInline):
     model = RoadSignTranslation
     extra = 1
     fields = ('language', 'name', 'meaning', 'detailed_explanation')
+      
 
 @admin.register(RoadSign)
 class RoadSignAdmin(admin.ModelAdmin):
@@ -80,13 +83,19 @@ class RoadSignAdmin(admin.ModelAdmin):
     search_fields = ('code', 'translations__name')
     list_filter = ('category', 'created_at')
     inlines = [RoadSignTranslationInline]
-    readonly_fields = ('image_preview',)
+    readonly_fields = ('image_preview', 'created_at', 'updated_at')
 
     def image_preview(self, obj):
+        """Safe preview for Cloudinary or local images"""
         if obj.image:
-            return format_html('<img src="{}" width="100" height="100" style="object-fit: cover;" />', obj.image.url)
-        return "(No image)"
+            # Use Cloudinary optimized URL
+            url = obj.image.url.replace('/upload/', '/upload/w_150,h_150,c_fill,q_auto/')
+            return format_html('<img src="{}" width="150" style="border-radius:8px;"/>', url)
+        return "No image"
     image_preview.short_description = "Preview"
+    
+    
+
     
 
 # === AnswerChoice ===

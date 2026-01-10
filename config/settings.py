@@ -150,6 +150,34 @@ MOCK_PAYMENT_VERIFICATION = os.getenv('PAYMENT_MOCK_MODE', 'True') == 'True'
 PAYMENT_CURRENCY = os.getenv('PAYMENT_CURRENCY', '')
 
 
+
+# === Cloudinary Configuration ===
+import cloudinary
+from cloudinary import config as cloudinary_config
+
+cloudinary_config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    secure=True  # Always use HTTPS
+)
+
+# Optional defaults for all uploads
+cloudinary.config(
+    folder='driving_exam',           # All files go under this folder
+    resource_type='image',           # Default for images
+    quality='auto',                  # Auto quality
+    fetch_format='auto'              # Best format (webp/avif when possible)
+)
+
+# Storage backends
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticCloudinaryStorage'
+# Media URL (Cloudinary serves it)
+MEDIA_URL = f'https://res.cloudinary.com/{os.getenv("CLOUDINARY_CLOUD_NAME")}/'
+
+
+
 # Security
 if not DEBUG:
     SECURE_SSL_REDIRECT = True

@@ -97,7 +97,6 @@ class SubscriptionTier(models.Model):
             return trans.name
         return self.translations.filter(language='en').first().name if self.translations.filter(language='en').exists() else f"Tier {self.price}"
 
-
 class Subscription(models.Model):
     """User's active/past subscription. Links to tier; users inherit tier's exams."""
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
