@@ -50,23 +50,47 @@ class Command(BaseCommand):
                 'or': "Mallattoolee Margaa"
             },
             'RULES': {
-                'en': "Traffic Rules",
-                'am': "የትራፊክ ደንቦች",
-                'ti': "ስርዓተ ትራፊክ",
-                'or': "Seera Margaa"
+                'en': "Traffic Rules & Regulations",
+                'am': "የትራፊክ ደንቦችና መመሪያዎች",
+                'ti': "ስርዓተ ትራፊክን መምርሕታትን",
+                'or': "Seerota Fi Qajeelfama Tirafikaa"
             },
-            'VEHICLE': {
-                'en': "Vehicle Handling",
-                'am': "ተሽከርካሪ አያያዝ",
-                'ti': "ኣተኣኻኽብ ተሽከርካሪ",
-                'or': "Qabinsa Mooraa"
+            'VEHICLE_TECH': {
+                'en': "Vehicle Technical Knowledge",
+                'am': "የተሽከርካሪ ቴክኒክ እውቀት",
+                'ti': "ፍልጠት ቴክኒክ ተሽከርካሪ",
+                'or': "Beekumsa Teeknika Konkolaataa"
+            },
+            'PRIORITY': {
+                'en': "Right of Way & Intersections",
+                'am': "የቅድሚያ መብት አጠቃቀም",
+                'ti': "ቀዳምነት መሰል ኣጠቓቕማ",
+                'or': "Mirga Duraa Fi Walqaxxaamuraa"
+            },
+            'MARKINGS': {
+                'en': "Road Markings",
+                'am': "የመንገድ ላይ ምልክቶች (መስመሮች)",
+                'ti': "ናይ ፅርግያ ምልክታት (መስመራት)",
+                'or': "Mallattoolee Daandii Irraa"
+            },
+            'SAFETY': {
+                'en': "Safety & First Aid",
+                'am': "ደህንነት እና የመጀመሪያ እርዳታ",
+                'ti': "ድሕንነትን ቀዳማይ ረድኤትን",
+                'or': "Nageenya Fi Gargarsa Jalqabaa"
             },
             'PEDESTRIAN': {
-                'en': "Pedestrian Safety",
-                'am': "የእግረኛ ደህንነት",
-                'ti': "ሓለዋ እግረኛ",
-                'or': "Nagaa Namoota Margaa"
+                'en': "Pedestrian & Cyclist Safety",
+                'am': "የእግረኛና የብስክሌት ደህንነት",
+                'ti': "ሓለዋ እግረኛን ብሽክለታን",
+                'or': "Nagaa Namoota Miillaa Fi Biskileetii"
             },
+            'LEGAL_PENALTY': {
+                'en': "Offenses & Penalties",
+                'am': "ጥፋቶች እና ቅጣቶች",
+                'ti': "ጥሕሰታትን ቅፅዓታትን",
+                'or': "Balleessaa Fi Adabbii"
+            }
         }
 
         category_objs = {}
