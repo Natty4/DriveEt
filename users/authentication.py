@@ -27,7 +27,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
     Validates Telegram WebApp init_data passed via Authorization header
     """
     
-    def authenticate(self, request) -> Optional[Tuple["User", None]]:
+    def authenticate(self, request) -> Optional[Tuple[User, None]]:
         """
         Authenticate user using Telegram Mini App init_data
         Header format: Authorization: TMA <init_data>
