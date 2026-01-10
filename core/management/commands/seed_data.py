@@ -384,11 +384,11 @@ class Command(BaseCommand):
         # 5. Subscription Tiers (no 'name' field — only translations)
         # ===================================================================
         tiers = [
-            {"price": 0, "days": 0, "max_exams": 1, "full_quiz": False,
+            {"price": 0, "days": 10, "max_exams": 1, "full_quiz": False, "is_free": True, "order": 0,
              "en": "Free Plan", "am": "ነጻ ፓኬጅ", "ti": "ፕላን ብዝክፈለ", "or": "Paakeejii Bilisaa"},
-            {"price": 100, "days": 30, "max_exams": 5, "full_quiz": True,
+            {"price": 100, "days": 30, "max_exams": 5, "full_quiz": True, "is_free": False, "order": 1,
              "en": "Basic Monthly", "am": "መሰረታዊ ወርሃዊ", "ti": "መባእታ ወርሒ", "or": "Ji'a Bu'uuraa"},
-            {"price": 250, "days": 90, "max_exams": 15, "full_quiz": True,
+            {"price": 250, "days": 90, "max_exams": 15, "full_quiz": True, "is_free": False, "order": 2,
              "en": "Premium 3-Month", "am": "ፕሪሚየም 3-ወር", "ti": "ፕሪሚየም 3 ወርሒ", "or": "Ol'aanaa 3 Ji'a"},
         ]
 
