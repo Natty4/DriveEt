@@ -20,3 +20,5 @@ Pillow
 dj-database-url
 django-import-export
 requests
+cloudinary 
+django-cloudinary-storage
