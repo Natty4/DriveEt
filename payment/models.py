@@ -77,15 +77,25 @@ class Transaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_profile = models.ForeignKey('users.UserProfile', on_delete=models.CASCADE, related_name='transactions')
     subscription_tier = models.ForeignKey('users.SubscriptionTier', on_delete=models.PROTECT)
-    reference_number = models.CharField(max_length=100, blank=True)  # User-submitted
-    account_last_5 = models.CharField(max_length=5, blank=True)  # For verification
+    reference_number = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Bank/mobile wallet transaction reference (optional if screenshot is provided)"
+    )
+    account_last_5 = models.CharField(
+        max_length=5,
+        blank=True,
+        null=True,
+        help_text="Last 5 digits of payer account (optional)"
+    )
     screenshot = CloudinaryField(
         'image',
         folder='transaction_screenshots/',
         resource_type='image',
         null=True,
         blank=True,
-        help_text="User-uploaded payment proof screenshot"
+        help_text="Screenshot of payment proof (alternative to reference number)"
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, null=True)
