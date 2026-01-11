@@ -16,7 +16,7 @@ class ExamAttemptDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExamAttempt
         fields = [
-            'id', 'exam', 'start_time', 'end_time',
+            'id', 'exam', 'start_time', 'end_time', 'timestamp',
             'score', 'is_passed', 'status', 'user_answers'
         ]
 
