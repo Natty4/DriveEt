@@ -90,7 +90,7 @@ class RoadSignAdmin(admin.ModelAdmin):
         if obj.image:
             # Use Cloudinary optimized URL
             url = obj.image.url.replace('/upload/', '/upload/w_150,h_150,c_fill,q_auto/')
-            return format_html('<img src="{}" width="150" style="border-radius:8px;"/>', url)
+            return format_html('<img src="{}" width="100" style="border-radius:8px;"/>', url)
         return "No image"
     image_preview.short_description = "Preview"
        

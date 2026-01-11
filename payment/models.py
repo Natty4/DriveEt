@@ -3,8 +3,9 @@
 import uuid
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from cloudinary.models import CloudinaryField
 
-from core.models import Language
+from common.constants import Language
 from users.models import Subscription
 
 
@@ -78,6 +79,14 @@ class Transaction(models.Model):
     subscription_tier = models.ForeignKey('users.SubscriptionTier', on_delete=models.PROTECT)
     reference_number = models.CharField(max_length=100, blank=True)  # User-submitted
     account_last_5 = models.CharField(max_length=5, blank=True)  # For verification
+    screenshot = CloudinaryField(
+        'image',
+        folder='transaction_screenshots/',
+        resource_type='image',
+        null=True,
+        blank=True,
+        help_text="User-uploaded payment proof screenshot"
+    )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)

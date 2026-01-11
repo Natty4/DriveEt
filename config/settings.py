@@ -139,6 +139,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Telegram Bot
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', '')
+
 
 MINIAPP_LINK = os.getenv('MINIAPP_LINK', '')
 
@@ -151,7 +153,7 @@ PAYMENT_CURRENCY = os.getenv('PAYMENT_CURRENCY', '')
 
 
 
-# === Cloudinary Configuration ===
+# Cloudinary Configuration
 import cloudinary
 from cloudinary import config as cloudinary_config
 
@@ -162,12 +164,11 @@ cloudinary_config(
     secure=True  # Always use HTTPS
 )
 
-# Optional defaults for all uploads
 cloudinary.config(
-    folder='driving_exam',           # All files go under this folder
-    resource_type='image',           # Default for images
-    quality='auto',                  # Auto quality
-    fetch_format='auto'              # Best format (webp/avif when possible)
+    folder='driving_exam',           
+    resource_type='image',          
+    quality='auto',
+    fetch_format='auto'            
 )
 
 # Storage backends
