@@ -93,10 +93,7 @@ class RoadSignAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="150" style="border-radius:8px;"/>', url)
         return "No image"
     image_preview.short_description = "Preview"
-    
-    
-
-    
+       
 
 # === AnswerChoice ===
 @admin.register(AnswerChoice)
@@ -350,10 +347,10 @@ class ExamAdmin(admin.ModelAdmin):
 
 @admin.register(ExamAttempt)
 class ExamAttemptAdmin(admin.ModelAdmin):
-    list_display = ('user_profile', 'exam', 'status', 'score', 'is_passed', 'start_time')
+    list_display = ('user_profile', 'exam', 'status', 'score', 'is_passed', 'start_time', 'timestamp')
     list_filter = ('status', 'is_passed', 'start_time')
     search_fields = ('user_profile__tg_id', 'exam__translations__title')
-    readonly_fields = ('start_time', 'end_time', 'raw_answers_json', 'score', 'is_passed')
+    readonly_fields = ('start_time', 'end_time', 'raw_answers_json', 'score', 'is_passed', 'timestamp')
     
     actions = ['soft_delete', 'hard_delete']
 
