@@ -31,9 +31,12 @@ from core.utils.subscription_utils import can_access_exam
 from core.responses import APIResponse
 from django.contrib.auth import get_user_model
 
+User = get_user_model()
+test_user = User.objects.get(id=1)
+
 
 class ContentViewSet(viewsets.ViewSet):
-    permission_classes = [IsAuthenticated, IsTelegramAuthenticated]
+    # permission_classes = [IsTelegramAuthenticated]
 
     def get_serializer_context(self):
         return {'request': self.request}
@@ -41,7 +44,7 @@ class ContentViewSet(viewsets.ViewSet):
     # 1. Dashboard: List of available exams
     @action(detail=False, methods=['get'])
     def my_exams(self, request):
-        exams_qs = get_exams_for_user(request.user.profile)
+        exams_qs = get_exams_for_user(test_user.profile)
         serializer = ExamMetadataSerializer(
             exams_qs,
             many=True,
@@ -52,7 +55,7 @@ class ContentViewSet(viewsets.ViewSet):
     # 2. Single Exam Detail — Fixed & Improved
     @action(detail=True, methods=['get'], url_path='exam')
     def exam_detail(self, request, pk=None):
-        profile = request.user.profile
+        profile = test_user.profile
         exam = get_object_or_404(Exam, id=pk)
 
         # Use unified access checker
@@ -86,10 +89,10 @@ class ContentViewSet(viewsets.ViewSet):
     # 3. Offline Sync: All Exams
     @action(detail=False, methods=['get'], url_path='exams/all')
     def all_exams_offline(self, request):
-        if not request.user.profile.is_subscribed():
+        if not test_user.profile.is_subscribed():
             return APIResponse.forbidden("Active subscription required for offline sync.")
 
-        profile = request.user.profile
+        profile = test_user.profile
         exams = Exam.objects.filter(
             tiers__subscription__user_profile=profile,
             tiers__subscription__expiry_date__gt=timezone.now()
@@ -116,7 +119,7 @@ class ContentViewSet(viewsets.ViewSet):
             Q(category__code='SIGN') | Q(associated_road_sign__isnull=False)
         ).distinct()
 
-        profile = request.user.profile
+        profile = test_user.profile
         is_full_access = (
             profile.is_subscribed() and
             profile.active_subscription.tier.full_road_sign_quiz
@@ -153,7 +156,7 @@ class ContentViewSet(viewsets.ViewSet):
             )
 
         exam = get_object_or_404(Exam, id=exam_id)
-        profile = request.user.profile
+        profile = test_user.profile
 
         if not can_access_exam(profile, exam):
             return APIResponse.forbidden(
@@ -199,16 +202,16 @@ class ContentViewSet(viewsets.ViewSet):
         1. Single: { "exam_id": "uuid" }
         2. Bulk: { "all": true }  OR empty body
         """
-        profile = request.user.profile
+        profile = test_user.profile
         exam_id = request.data.get('exam_id')
         reset_all = request.data.get('all', False) or exam_id is None
-        exams_qs = get_exams_for_user(request.user.profile)
+        exams_qs = get_exams_for_user(test_user.profile)
         
         if reset_all:
             # Bulk reset: all non-deleted attempts for this user
             
             attempts_qs = ExamAttempt.filter(
-                user_profile=request.user.profile,
+                user_profile=test_user.profile,
                 deleted_at__isnull=True
             )
 
@@ -268,8 +271,8 @@ class ContentViewSet(viewsets.ViewSet):
         - No param: All attempts for user's active subscription
         Only non-deleted attempts
         """
-        # profile = request.user.profile
-        profile = request.user.profile
+        # profile = test_user.profile
+        profile = test_user.profile
         exam_id = request.query_params.get('exam_id')
 
         if not profile.is_subscribed():
