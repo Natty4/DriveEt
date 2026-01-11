@@ -7,7 +7,7 @@ def send_screenshot_to_admin(user, transaction, screenshot_url):
     chat_id = settings.ADMIN_CHAT_ID
     message = (
         f"New payment pending approval!\n"
-        f"User: {user.telegram_id} (@{user.telegram_username})\n"
+        f"User: {user.tg_id} (@{user.tg_username})\n"
         f"Tier: {transaction.subscription_tier.display_name}\n"
         f"Amount: {transaction.amount} ETB\n"
         f"Reference: {transaction.reference_number or 'N/A'}\n"
