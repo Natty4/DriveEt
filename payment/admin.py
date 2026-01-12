@@ -26,8 +26,9 @@ class PaymentMethodAdmin(admin.ModelAdmin):
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'user_profile', 'subscription_tier', 'payment_method',
-        'amount', 'status_display', 'reference_number', 'account_last_5',
+        'id', 'user_profile', 'reference_number', 'account_last_5', 
+        'status_display', 'amount',
+        'subscription_tier', 'payment_method',
         'has_screenshot', 'created_at'
     )
     list_filter = ('status', 'payment_method', 'created_at')
