@@ -94,6 +94,10 @@ class PaymentViewSet(viewsets.ViewSet):
                     )
                 except ValidationError as e:
                     logger.info(f"Auto-verification failed: {e}. Falling back to manual review.")
+                    return APIResponse.error(
+                        message="An error occurred during purchase. Please try again.",
+                        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
 
             # 3. Manual review flow (screenshot or failed auto)
             elif screenshot:
