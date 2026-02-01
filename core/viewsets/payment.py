@@ -47,6 +47,7 @@ class PaymentViewSet(viewsets.ViewSet):
         reference_number = request.data.get('reference_number')
         account_last_5 = request.data.get('account_last_5', '')
         screenshot = request.FILES.get('screenshot')
+        message = ""
 
         # Validation: at least one verification method
         if not reference_number and not screenshot:
