@@ -96,20 +96,22 @@ class RoadSignAdmin(admin.ModelAdmin):
        
 
 # === AnswerChoice ===
-@admin.register(AnswerChoice)
-class AnswerChoiceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'question', 'is_correct']
     
 class AnswerChoiceTranslationInline(admin.StackedInline):
     model = AnswerChoiceTranslation
     extra = 1
     fields = ('language', 'text')
 
+@admin.register(AnswerChoice)
+class AnswerChoiceAdmin(admin.ModelAdmin):
+    list_display = ['id', 'question', 'is_correct']
+    inlines = [AnswerChoiceTranslationInline]
+    
 class AnswerChoiceInline(admin.TabularInline):
     model = AnswerChoice
     extra = 1
     fields = ('road_sign_option', 'is_correct', 'order')
-    inlines = [AnswerChoiceTranslationInline]
+    
 
 # === Explanation ===
 class ExplanationTranslationInline(admin.StackedInline):
