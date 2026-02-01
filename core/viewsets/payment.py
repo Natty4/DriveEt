@@ -17,6 +17,7 @@ from core.permissions import IsTelegramAuthenticated
 from core.utils.telegram_bot import send_screenshot_to_admin
 
 logger = logging.getLogger(__name__)
+
 class PaymentViewSet(viewsets.ViewSet):
     permission_classes = [IsTelegramAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
@@ -94,7 +95,7 @@ class PaymentViewSet(viewsets.ViewSet):
                     logger.info(f"Auto-verification failed: {e}. Falling back to manual review.")
 
             # 3. Manual review flow (screenshot or failed auto)
-            if screenshot:
+            elif screenshot:
                 # Send screenshot to admin via Telegram
                 screenshot_url = transaction_obj.screenshot.url
                 send_screenshot_to_admin(
