@@ -82,8 +82,8 @@ class SubscriptionService:
 
         # 5. Receiver verification
         expected_receiver = {
-            'TELEBIRR': getattr(settings, 'TELEBIRR_RECEIVER_PHONE', None),
-            'BOA': getattr(settings, 'BOA_RECEIVER_ACCOUNT', None),
+            'TELEBIRR': getattr(settings, 'TELEBIRR_PHONE', None),
+            'BOA': getattr(settings, 'BOA_ACCOUNT', None),
         }.get(payment_method.code.upper())
 
         if expected_receiver and result.receiver_account and expected_receiver not in str(result.receiver_account):
