@@ -1,10 +1,16 @@
 # core/admin.py
 
+import json
+from uuid import uuid4
 from django.contrib import admin, messages
 from django.utils import timezone
+from django.urls import path
 from django.utils.html import format_html
 from django.shortcuts import render, redirect
 from django.contrib.admin import SimpleListFilter
+from django.contrib.admin.helpers import ActionForm
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from import_export.admin import ImportExportMixin
 from cloudinary.models import CloudinaryField
 from cloudinary.forms import CloudinaryJsFileField
@@ -93,37 +99,446 @@ class RoadSignAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" width="100" style="border-radius:8px;"/>', url)
         return "No image"
     image_preview.short_description = "Preview"
-       
-
-# === AnswerChoice ===
-    
+      
+      
 class AnswerChoiceTranslationInline(admin.StackedInline):
     model = AnswerChoiceTranslation
     extra = 1
     fields = ('language', 'text')
+    verbose_name = _("Translation")
+    verbose_name_plural = _("Translations")
+
 
 @admin.register(AnswerChoice)
 class AnswerChoiceAdmin(admin.ModelAdmin):
-    list_display = ['id', 'question', 'is_correct']
+    list_display = ['id', 'question', 'order', 'is_correct', 'text_or_sign']
+    list_filter = ['is_correct', 'question__question_type']
+    search_fields = ['translations__text', 'road_sign_option__code']
+
     inlines = [AnswerChoiceTranslationInline]
-    
+
+    def text_or_sign(self, obj):
+        if obj.road_sign_option:
+            return f"Sign: {obj.road_sign_option.code}"
+        trans = obj.translations.filter(language='en').first()
+        return trans.text[:60] + "…" if trans else "—"
+    text_or_sign.short_description = _("Content")
+
+
 class AnswerChoiceInline(admin.TabularInline):
     model = AnswerChoice
-    extra = 1
+    extra = 2  # most questions have ≥2 choices
     fields = ('road_sign_option', 'is_correct', 'order')
-    
+    # readonly_fields = ('order',)  # usually managed automatically
+    show_change_link = True
 
-# === Explanation ===
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        # Optional: can add form validation here
+        return formset
+
+
+class QuestionTranslationInline(admin.StackedInline):
+    model = QuestionTranslation
+    extra = 1
+    fields = ('language', 'content')
+    min_num = 1  # at least English recommended
+    verbose_name = _("Question Translation")
+    verbose_name_plural = _("Question Translations")
+
+
 class ExplanationTranslationInline(admin.StackedInline):
     model = ExplanationTranslation
     extra = 1
     fields = ('language', 'detail')
+    verbose_name = _("Explanation Translation")
+    verbose_name_plural = _("Explanation Translations")
+
 
 class ExplanationInline(admin.StackedInline):
     model = Explanation
     extra = 1
+    max_num = 1   # OneToOne relation
+    can_delete = True
     fields = ('media_url', 'media_type')
     inlines = [ExplanationTranslationInline]
+
+
+# ───────────────────────────────────────────────
+# Question Admin with JSON Import
+# ───────────────────────────────────────────────
+
+
+
+class JSONImportForm(forms.Form):
+    json_file = forms.FileField(
+        label="Upload JSON File",
+        help_text="Paste your q_bank array (TT, TI, IT questions)",
+        widget=forms.FileInput(attrs={'accept': '.json'})
+    )
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'question_type',
+        'category',
+        'difficulty',
+        'is_premium',
+        'associated_road_sign',   # shows __str__ of RoadSign
+        'created_at',
+    )
+    list_filter = ('question_type', 'difficulty', 'category', 'is_premium', 'created_at')
+    search_fields = ('translations__content', 'associated_road_sign__code')
+    readonly_fields = ('created_at', 'updated_at')
+
+    inlines = [
+        QuestionTranslationInline,   # reuse your existing inlines
+        AnswerChoiceInline,
+        ExplanationInline,
+    ]
+    actions = ['make_premium', 'make_free']
+    
+    @admin.action(description="Mark selected questions as PREMIUM")
+    def make_premium(self, request, queryset):
+        updated = queryset.exclude(is_premium=True).update(is_premium=True)
+        if updated:
+            self.message_user(request, f"{updated} questions marked as PREMIUM.", messages.SUCCESS)
+        else:
+            self.message_user(request, "No questions were updated (already premium).", messages.INFO)
+
+    @admin.action(description="Mark selected questions as FREE")
+    def make_free(self, request, queryset):
+        updated = queryset.exclude(is_premium=False).update(is_premium=False)
+        if updated:
+            self.message_user(request, f"{updated} questions marked as FREE.", messages.SUCCESS)
+        else:
+            self.message_user(request, "No questions were updated (already free).", messages.INFO)
+
+    # ========================== CUSTOM JSON IMPORT ==========================
+
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_json_import_button'] = True
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-json/', self.admin_site.admin_view(self.import_json_view), name='question_import_json'),
+            path('import-json/confirm/', self.admin_site.admin_view(self.confirm_import_view), name='question_import_confirm'),
+        ]
+        print("Custom admin URLs registered:", [u.pattern for u in custom_urls])
+        return custom_urls + urls
+
+    # Step 1: Upload JSON
+    def import_json_view(self, request):
+        if request.method == 'POST':
+            form = JSONImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                file = request.FILES['json_file']
+                
+                if file.size == 0:
+                    messages.error(request, "The uploaded file is empty (0 bytes).")
+                    return redirect('admin:yourapp_question_changelist')  # ← fix yourapp name
+                
+                try:
+                    # Read the entire file content as string
+                    raw_content = file.read().decode('utf-8')
+                    
+                    # Make Python booleans JSON-compatible (optional safety)
+                    raw_content = raw_content.replace('True', 'true').replace('False', 'false')
+                    
+                    # IMPORTANT: use json.loads() when you already have a string
+                    data = json.loads(raw_content)
+                    
+                    if not isinstance(data, list):
+                        raise ValidationError("Root must be a JSON array []")
+                    
+                    if len(data) > 500:
+                        messages.warning(request, "Large file (>500 questions). Preview may be slow.")
+                    
+                    # Store in session
+                    request.session['import_data'] = data
+                    request.session['import_filename'] = file.name
+                    
+                    return redirect('admin:question_import_confirm')
+                    
+                except json.JSONDecodeError as e:
+                    messages.error(request, f"Invalid JSON: {e}")
+                    print("JSON error details:", str(e))  # helpful in console
+                except UnicodeDecodeError:
+                    messages.error(request, "File is not valid UTF-8 encoded text.")
+                except Exception as e:
+                    messages.error(request, f"Error processing file: {e}")
+                    print("Unexpected error:", str(e))
+                    
+                # If we reach here → error occurred → stay on page or redirect
+                return redirect('..')  # or render the form again with errors
+
+        # GET request → show upload form
+        form = JSONImportForm()
+        context = {
+            **self.admin_site.each_context(request),
+            'title': 'Import Questions from JSON',
+            'form': form,
+            'opts': self.model._meta,
+        }
+        return render(request, 'admin/question_import_upload.html', context)
+
+    # Step 2: Preview + Confirm Import
+    def confirm_import_view(self, request):
+        data = request.session.get('import_data')
+        if not data:
+            messages.error(request, "No import data found. Please upload again.")
+            return redirect('admin:question_import_json')
+
+        if request.method == 'POST':
+            # Final Import
+            stats = self._process_bulk_import(data, dry_run=False, request=request)
+            # Clean session
+            request.session.pop('import_data', None)
+            request.session.pop('import_filename', None)
+
+            messages.success(request,
+                f"Import completed! Created: {stats['created']} | "
+                f"Updated: {stats['updated']} | Skipped: {stats['skipped']}"
+            )
+            return redirect('..')
+
+        # Preview mode
+        preview_stats = self._process_bulk_import(data, dry_run=True, request=request)
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': f"Preview Import — {len(data)} Questions",
+            'preview': preview_stats['preview_items'][:20],   # show max 20 rows
+            'total_questions': len(data),
+            'stats': preview_stats,
+            'filename': request.session.get('import_filename', 'questions.json'),
+        }
+        return render(request, 'admin/question_import_preview.html', context)
+
+    # Core logic: Preview (dry_run=True) or Real Import
+    def _process_bulk_import(self, data_list, dry_run=True, request=None):
+        created = updated = skipped = 0
+        preview_items = []
+        lang_codes = ['en', 'am', 'ti', 'or']
+
+        for idx, q in enumerate(data_list, 1):
+            try:
+                q_type = q.get('type')
+                if q_type not in ('TT', 'TI', 'IT'):
+                    raise ValueError(f"Invalid question type: {q_type}")
+
+                # ── Category ──
+                category = None
+                if q.get('cat'):
+                    category = QuestionCategory.objects.filter(code__iexact=q['cat']).first()
+                    if not category:
+                        raise ValueError(f"Category code not found: {q.get('cat')}")
+
+                # ── Associated road sign (mainly useful for sign-related questions) ──
+                road_sign = None
+                sign_val = q.get('sign')
+                if sign_val:
+                    if isinstance(sign_val, (int, str)) and str(sign_val).isdigit():
+                        road_sign = RoadSign.objects.filter(pk=sign_val).first()
+                    else:
+                        road_sign = RoadSign.objects.filter(code__iexact=str(sign_val)).first()
+                    if not road_sign:
+                        raise ValueError(f"Road sign not found: {sign_val}")
+
+                # ── Question image (mainly for IT questions) ──
+                question_image = q.get('img')
+
+                # ── Content ──
+                content_dict = {
+                    lang: str(q[lang]).strip()
+                    for lang in lang_codes
+                    if lang in q and q[lang]
+                }
+
+                if 'en' not in content_dict:
+                    raise ValueError("English question text is required")
+
+                # Duplicate check (English content + type)
+                existing = None
+                if content_dict.get('en'):
+                    existing = Question.objects.filter(
+                        translations__language='en',
+                        translations__content__iexact=content_dict['en'],
+                        question_type=q_type
+                    ).first()
+
+                status = "updated" if existing else "created"
+
+                if not dry_run:
+                    if existing:
+                        question = existing
+                        updated += 1
+                    else:
+                        question = Question.objects.create(
+                            id=uuid4(),
+                            category=category,
+                            associated_road_sign=road_sign,
+                            question_type=q_type,
+                            difficulty=q.get('diff', 'medium'),
+                            is_premium=q.get('is_premium', False),
+                            media_image=question_image if q_type == 'IT' else None,
+                        )
+                        created += 1
+
+                    self._save_question_relations(question, q, content_dict, lang_codes, existing)
+                else:
+                    # Preview
+                    preview_items.append({
+                        'index': idx,
+                        'en': content_dict.get('en', '—')[:70],
+                        'type': q_type,
+                        'category': category.code if category else '—',
+                        'sign': road_sign.code if road_sign else '—',
+                        'has_image': bool(question_image) and q_type == 'IT',
+                        'choices_count': len(q.get('choices', [])),
+                        'status': status,
+                    })
+
+                    if existing:
+                        updated += 1
+                    else:
+                        created += 1
+
+            except Exception as e:
+                skipped += 1
+                msg = f"Skipped question #{idx}: {str(e)}"
+                if request and not dry_run:
+                    messages.warning(request, msg)
+                print(msg)  # console log
+
+        return {
+            'created': created,
+            'updated': updated,
+            'skipped': skipped,
+            'preview_items': preview_items,
+        }
+
+
+    def _save_question_relations(self, question, q_data, content_dict, lang_codes, existing):
+        # Question Translations
+        for lang, text in content_dict.items():
+            QuestionTranslation.objects.update_or_create(
+                question=question,
+                language=lang,
+                defaults={'content': text}
+            )
+
+        # Choices handling ────────────────────────────────────────
+        if existing:
+            question.choices.all().delete()
+
+        choices_data = q_data.get('choices') or []
+        if not choices_data:
+            raise ValueError("At least one answer choice is required")
+
+        for order, ch in enumerate(choices_data, 1):
+            is_correct = bool(ch.get('is_correct', False))
+
+            if question.question_type == 'TI':
+                # Text → Image : must have road sign reference in choice
+                sign_val = ch.get('sign')
+                if not sign_val:
+                    raise ValueError(f"TI question requires 'sign' in each choice (choice {order})")
+
+                sign_obj = None
+                if isinstance(sign_val, (int, str)) and str(sign_val).isdigit():
+                    sign_obj = RoadSign.objects.filter(pk=sign_val).first()
+                else:
+                    sign_obj = RoadSign.objects.filter(code__iexact=str(sign_val)).first()
+
+                if not sign_obj:
+                    raise ValueError(f"Road sign not found for choice {order}: {sign_val}")
+
+                AnswerChoice.objects.create(
+                    question=question,
+                    road_sign_option=sign_obj,
+                    is_correct=is_correct,
+                    order=order
+                )
+                # No text translation needed for image choices
+
+            else:
+                # TT and IT → text choices
+                ch_content = {
+                    lang: str(ch[lang]).strip()
+                    for lang in lang_codes
+                    if lang in ch and ch[lang]
+                }
+
+                if 'en' not in ch_content:
+                    raise ValueError(f"English text required for choice {order}")
+
+                choice = AnswerChoice.objects.create(
+                    question=question,
+                    is_correct=is_correct,
+                    order=order
+                )
+
+                for lang, text in ch_content.items():
+                    AnswerChoiceTranslation.objects.create(
+                        answer_choice=choice,
+                        language=lang,
+                        text=text
+                    )
+
+        # Explanation ─────────────────────────────────────────────
+        exp_data = q_data.get('explanation')
+        if exp_data:
+            if existing and hasattr(question, 'explanation'):
+                question.explanation.delete()
+
+            exp = Explanation.objects.create(
+                question=question,
+                media_url=exp_data.get('media_url'),
+                media_type=exp_data.get('media_type')
+            )
+
+            for lang in lang_codes:
+                if lang in exp_data and exp_data[lang]:
+                    ExplanationTranslation.objects.create(
+                        explanation=exp,
+                        language=lang,
+                        detail=str(exp_data[lang]).strip()
+                    )
+# === AnswerChoice ===
+    
+# class AnswerChoiceTranslationInline(admin.StackedInline):
+#     model = AnswerChoiceTranslation
+#     extra = 1
+#     fields = ('language', 'text')
+
+# @admin.register(AnswerChoice)
+# class AnswerChoiceAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'question', 'is_correct']
+#     inlines = [AnswerChoiceTranslationInline]
+    
+# class AnswerChoiceInline(admin.TabularInline):
+#     model = AnswerChoice
+#     extra = 1
+#     fields = ('road_sign_option', 'is_correct', 'order')
+    
+
+# === Explanation ===
+# class ExplanationTranslationInline(admin.StackedInline):
+#     model = ExplanationTranslation
+#     extra = 1
+#     fields = ('language', 'detail')
+
+# class ExplanationInline(admin.StackedInline):
+#     model = Explanation
+#     extra = 1
+#     fields = ('media_url', 'media_type')
+#     inlines = [ExplanationTranslationInline]
 
 @admin.register(Explanation)  
 class ExplanationAdmin(admin.ModelAdmin):
@@ -132,82 +547,82 @@ class ExplanationAdmin(admin.ModelAdmin):
     
     
 # === Question ===
-class QuestionTranslationInline(admin.StackedInline):
-    model = QuestionTranslation
-    extra = 1
-    fields = ('language', 'content')
+# class QuestionTranslationInline(admin.StackedInline):
+#     model = QuestionTranslation
+#     extra = 1
+#     fields = ('language', 'content')
 
-@admin.register(Question)
-class QuestionAdmin(ImportExportMixin, admin.ModelAdmin):
-    list_display = (
-        'id',
-        'category',
-        'question_type',
-        'difficulty',
-        'is_premium',
-        'associated_road_sign',
-        'created_at',
-    )
-    list_filter = (
-        'question_type',
-        'difficulty',
-        'category',
-        'is_premium',
-        'created_at',
-    )
-    search_fields = (
-        'id',
-        'translations__content',
-        'associated_road_sign__code',
-    )
-    inlines = [
-        QuestionTranslationInline,
-        AnswerChoiceInline,
-        ExplanationInline,
-    ]
-    readonly_fields = ('created_at', 'updated_at')
+# @admin.register(Question)
+# class QuestionAdmin(ImportExportMixin, admin.ModelAdmin):
+#     list_display = (
+#         'id',
+#         'category',
+#         'question_type',
+#         'difficulty',
+#         'is_premium',
+#         'associated_road_sign',
+#         'created_at',
+#     )
+#     list_filter = (
+#         'question_type',
+#         'difficulty',
+#         'category',
+#         'is_premium',
+#         'created_at',
+#     )
+#     search_fields = (
+#         'id',
+#         'translations__content',
+#         'associated_road_sign__code',
+#     )
+#     inlines = [
+#         QuestionTranslationInline,
+#         AnswerChoiceInline,
+#         ExplanationInline,
+#     ]
+#     readonly_fields = ('created_at', 'updated_at')
 
-    actions = ['make_premium', 'make_free']
+#     actions = ['make_premium', 'make_free']
 
-    # --------------------
-    # Admin Actions
-    # --------------------
+#     # --------------------
+#     # Admin Actions
+#     # --------------------
 
-    @admin.action(description="Mark selected questions as PREMIUM")
-    def make_premium(self, request, queryset):
-        if not queryset.exists():
-            self.message_user(
-                request,
-                "No questions selected.",
-                level=messages.WARNING,
-            )
-            return
+#     @admin.action(description="Mark selected questions as PREMIUM")
+#     def make_premium(self, request, queryset):
+#         if not queryset.exists():
+#             self.message_user(
+#                 request,
+#                 "No questions selected.",
+#                 level=messages.WARNING,
+#             )
+#             return
 
-        updated = queryset.exclude(is_premium=True).update(is_premium=True)
+#         updated = queryset.exclude(is_premium=True).update(is_premium=True)
 
-        self.message_user(
-            request,
-            f"{updated} question(s) successfully marked as PREMIUM.",
-            level=messages.SUCCESS,
-        )
+#         self.message_user(
+#             request,
+#             f"{updated} question(s) successfully marked as PREMIUM.",
+#             level=messages.SUCCESS,
+#         )
 
-    @admin.action(description="Mark selected questions as FREE")
-    def make_free(self, request, queryset):
-        if not queryset.exists():
-            self.message_user(
-                request,
-                "No questions selected.",
-                level=messages.WARNING,
-            )
-            return
+#     @admin.action(description="Mark selected questions as FREE")
+#     def make_free(self, request, queryset):
+#         if not queryset.exists():
+#             self.message_user(
+#                 request,
+#                 "No questions selected.",
+#                 level=messages.WARNING,
+#             )
+#             return
 
-        updated = queryset.exclude(is_premium=False).update(is_premium=False)
+#         updated = queryset.exclude(is_premium=False).update(is_premium=False)
 
-        self.message_user(
-            request,
-            f"{updated} question(s) successfully marked as FREE.",
-            level=messages.SUCCESS,
-        )
+#         self.message_user(
+#             request,
+#             f"{updated} question(s) successfully marked as FREE.",
+#             level=messages.SUCCESS,
+#         )
 
 # === Exam ===
 class ExamTranslationInline(admin.StackedInline):

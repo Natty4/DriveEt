@@ -1,0 +1,10 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-row">{{ form.json_file }}</div>
+  <div class="submit-row">
+    <input type="submit" value="Preview Import" class="default">
+  </div>
+</form>
+{% endblock %}
