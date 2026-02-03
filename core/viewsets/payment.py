@@ -78,20 +78,21 @@ class PaymentViewSet(viewsets.ViewSet):
                 status=Transaction.Status.PENDING
             )
 
-            # 2. If reference provided → try auto-verify
+            # 2. If reference provided → try auto-verify                     
             if reference_number:
                 try:
-                    SubscriptionService.activate_via_payment(
+                    transaction_obj = SubscriptionService.activate_via_payment(
                         user_profile=user_profile,
                         tier_id=tier_id,
                         payment_method_id=payment_method_id,
                         reference_number=reference_number,
-                        account_last_5=account_last_5
+                        account_last_5=account_last_5,
+                        pending_transaction=None  # will create inside
                     )
                     return APIResponse.created(
                         message="Subscription activated successfully!",
-                        data={"transaction_id": str(transaction_obj.id)}
-                    )
+                        # data={"transaction_id": str(transaction_obj.id)}
+                        )
                 except ValidationError as e:
                     logger.info(f"Auto-verification failed: {e}. Falling back to manual review.")
                     return APIResponse.error(

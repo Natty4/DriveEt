@@ -2,6 +2,7 @@
 
 import uuid
 from django.db import models, transaction
+from django.db.models import UniqueConstraint, Q
 from django.utils.translation import gettext_lazy as _
 from cloudinary.models import CloudinaryField
 
@@ -100,13 +101,32 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_method = models.ForeignKey(PaymentMethod, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    
+    verified_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    payer_name = models.CharField(max_length=255, blank=True, null=True)
+    payer_phone = models.CharField(max_length=20, blank=True, null=True)
+    receiver_name = models.CharField(max_length=255, blank=True, null=True)
+    receiver_account = models.CharField(max_length=50, blank=True, null=True)
+    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_date = models.DateTimeField(null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Transaction")
         verbose_name_plural = _("Transactions")
-        indexes = [models.Index(fields=['user_profile', 'status'])]
+        indexes = [
+            models.Index(fields=['user_profile', 'status']),
+            models.Index(fields=['payment_method', 'reference_number']),
+            ]
+        constraints = [
+            UniqueConstraint(
+                fields=['payment_method', 'reference_number'],
+                condition=Q(status='VERIFIED'),
+                name='unique_verified_payment_reference'
+            )
+        ]
 
     def activate_subscription(self):
         with transaction.atomic():

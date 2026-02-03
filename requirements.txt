@@ -22,3 +22,4 @@ django-import-export
 requests
 cloudinary 
 django-cloudinary-storage
+python-dateutil
