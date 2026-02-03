@@ -229,7 +229,6 @@ class QuestionAdmin(admin.ModelAdmin):
             path('import-json/', self.admin_site.admin_view(self.import_json_view), name='question_import_json'),
             path('import-json/confirm/', self.admin_site.admin_view(self.confirm_import_view), name='question_import_confirm'),
         ]
-        print("Custom admin URLs registered:", [u.pattern for u in custom_urls])
         return custom_urls + urls
 
     # Step 1: Upload JSON
