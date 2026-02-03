@@ -13,6 +13,6 @@ router.register(r'subscription', SubscriptionViewSet, basename='subscription')
 router.register(r'payment', PaymentViewSet, basename='payment')
 
 urlpatterns = [
-    path('auth/telegram-login/', TelegramLoginView.as_view(), name='telegram-login'),
+    path('auth/tg-login/', TelegramLoginView.as_view(), name='tg-login'),
     path('', include(router.urls)),
 ]
