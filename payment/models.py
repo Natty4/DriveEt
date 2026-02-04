@@ -4,7 +4,10 @@ import uuid
 from django.db import models, transaction
 from django.db.models import UniqueConstraint, Q
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+from datetime import timedelta
 from cloudinary.models import CloudinaryField
+
 
 from common.constants import Language
 from users.models import Subscription
@@ -130,12 +133,47 @@ class Transaction(models.Model):
 
     def activate_subscription(self):
         with transaction.atomic():
-            # Create subscription
-            sub = Subscription.objects.create(user_profile=self.user_profile, tier=self.subscription_tier)
-            # Update user profile
-            self.user_profile.active_subscription = sub
-            self.user_profile.expiry_date = sub.expiry_date
-            self.user_profile.save()
-            # No need to copy exams; query via tier
+            now = timezone.now()
+
+            # Deactivate ALL previous subscriptions of this user
+            Subscription.objects.filter(
+                user_profile=self.user_profile,
+                is_active=True
+            ).update(is_active=False)
+
+            # Check if renewing same tier
+            latest_same_tier = Subscription.objects.filter(
+                user_profile=self.user_profile,
+                tier=self.subscription_tier
+            ).order_by('-created_at', '-updated_at').first()
+
+            if latest_same_tier:
+                # Renewal / extension
+                base_date = latest_same_tier.expiry_date if latest_same_tier.expiry_date and latest_same_tier.expiry_date > now else now
+                new_expiry = base_date + timedelta(days=self.subscription_tier.duration_days)
+                latest_same_tier.expiry_date = new_expiry
+                latest_same_tier.is_active = True
+                latest_same_tier.save(update_fields=['expiry_date', 'is_active'])
+                subscription = latest_same_tier
+            else:
+                # New subscription
+                new_expiry = now + timedelta(days=self.subscription_tier.duration_days) if self.subscription_tier.duration_days > 0 else None
+                subscription = Subscription.objects.create(
+                    user_profile=self.user_profile,
+                    tier=self.subscription_tier,
+                    expiry_date=new_expiry,
+                    is_active=True
+                )
+
+            # Update profile
+            self.user_profile.active_subscription = subscription
+            self.user_profile.expiry_date = subscription.expiry_date
+            self.user_profile.save(update_fields=['active_subscription', 'expiry_date'])
+
+            # Optional: mark transaction as used if not already
+            if self.status != Transaction.Status.VERIFIED:
+                self.status = Transaction.Status.VERIFIED
+                self.save()
+        
 
 
