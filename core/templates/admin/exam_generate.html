@@ -1,9 +1,262 @@
 {% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .generate-exam-container {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .page-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+    .section-group {
+      border: 1px solid #565758ff;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .section-title {
+      font-size: 1.25rem;
+      margin: 0 0 1.25rem 0;
+      color: #212529;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      font-weight: 500;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .checkbox-group {
+      margin-top: 0.75rem;
+    }
+    .form-check {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+    }
+    .checkbox-group .form-check {
+      margin-bottom: 0.5rem;    
+    }
+    .category-field {
+      margin-bottom: 1rem;
+    }
+    .category-label {
+      font-weight: 500;
+      color: #343a40;
+    }
+    .category-available {
+      color: #198754;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .btn-generate {
+      padding: 0.75rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 500;
+      background: #198754;
+      cursor: pointer;
+      border-radius: 13px;
+      color: white;               /* better visibility */
+      border: none;               /* remove default border if needed */
+    }
+    .btn-generate:hover {
+      background: #146c43;        /* subtle hover effect */
+    }
+    .errorlist {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      list-style: none;
+      padding-left: 0;
+    }
+    .errorlist li {
+      margin-bottom: 0.25rem;
+    }
+    .has-error .form-control,
+    .has-error select,
+    .has-error input[type="number"],
+    .has-error input[type="text"] {
+      border-color: #dc3545;
+      background-image: none; /* remove default invalid icon if any */
+    }
+    .alert-danger {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border-radius: 6px;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
-<h1>Generate New Exam</h1>
-<form method="post">
+
+<div class="generate-exam-container">
+
+
+  <form method="post" novalidate>
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Generate Exam</button>
-</form>
+
+    
+
+    <div class="section-group">
+      <h2 class="section-title">Exam Information</h2>
+      
+      <div class="form-group">
+        <label for="{{ form.title_en.id_for_label }}">Title (English):</label>
+        {{ form.title_en }}
+        {% if form.title_en.errors %}
+            <ul class="errorlist">
+                {% for error in form.title_en.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.title_am.id_for_label }}">Title (Amharic):</label>
+        {{ form.title_am }}
+        {% if form.title_am.errors %}
+            <ul class="errorlist">
+              {% for error in form.title_am.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.title_ti.id_for_label }}">Title (Tigrinya):</label>
+        {{ form.title_ti }}
+        {% if form.title_ti.errors %}
+            <ul class="errorlist">
+              {% for error in form.title_ti.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label for="{{ form.title_or.id_for_label }}">Title (Oromiffa):</label>
+        {{ form.title_or }}
+        {% if form.title_or.errors %}
+            <ul class="errorlist">
+              {% for error in form.title_or.errors %}<li>{{ error }}</li>{% endfor %}
+            </ul>
+        {% endif %}
+      </div>
+    </div>
+
+
+    <div class="section-group">
+      <h2 class="section-title">Exam Settings</h2>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="form-group {% if form.difficulty.errors %}has-error{% endif %}">
+            <label for="{{ form.difficulty.id_for_label }}">Difficulty:</label>
+            {{ form.difficulty }}
+            {% if form.difficulty.errors %}
+              <ul class="errorlist">{{ form.difficulty.errors }}</ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group {% if form.question_count.errors %}has-error{% endif %}">
+            <label for="{{ form.question_count.id_for_label }}">Number of Questions:</label>
+            {{ form.question_count }}
+            {% if form.question_count.errors %}
+              <ul class="errorlist">{{ form.question_count.errors }}</ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="form-group {% if form.duration_minutes.errors %}has-error{% endif %}">
+            <label for="{{ form.duration_minutes.id_for_label }}">Duration (minutes):</label>
+            {{ form.duration_minutes }}
+            {% if form.duration_minutes.errors %}
+              <ul class="errorlist">{{ form.duration_minutes.errors }}</ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- passing score + is_free -->
+      <div class="row g-3 mt-2">
+        <div class="col-md-6">
+          <div class="form-group {% if form.passing_score.errors %}has-error{% endif %}">
+            <label for="{{ form.passing_score.id_for_label }}">Passing Score (%):</label>
+            {{ form.passing_score }}
+            {% if form.passing_score.errors %}
+              <ul class="errorlist">{{ form.passing_score.errors }}</ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group mt-4 pt-2">
+            <div class="form-check">
+              {{ form.is_free }}
+              <label class="form-check-label" for="{{ form.is_free.id_for_label }}">
+                Free Exam
+              </label>
+            </div>
+            {% if form.is_free.errors %}
+              <ul class="errorlist mt-2">{{ form.is_free.errors }}</ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Types -->
+      <div class="form-group mt-4 {% if form.question_type.errors %}has-error{% endif %}">
+        <label>Question Types:</label>
+        <div class="checkbox-group">
+          {% for choice in form.question_type %}
+            <div class="form-check">
+              {{ choice.tag }}
+              <label class="form-check-label" for="{{ choice.id_for_label }}">
+                {{ choice.choice_label }}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+        {% if form.question_type.errors %}
+          <ul class="errorlist">{{ form.question_type.errors }}</ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="section-group">
+      <h2 class="section-title">Questions per Category</h2>
+
+      {% for field in form %}
+        {% if field.name|slice:":4" == "cat_" %}
+          <div class="category-field {% if field.errors %}has-error{% endif %}">
+            <label class="category-label category-available" for="{{ field.id_for_label }}">
+              {{ field.label|striptags }}
+            </label>
+            {{ field }}
+            {% if field.errors %}
+              <ul class="errorlist">{{ field.errors }}</ul>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="text-center mt-5">
+      <button type="submit" class="btn btn-lg btn-generate">
+        Generate Exam
+      </button>
+    </div>
+
+  </form>
+</div>
 {% endblock %}

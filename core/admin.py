@@ -509,6 +509,10 @@ class QuestionAdmin(admin.ModelAdmin):
                         language=lang,
                         detail=str(exp_data[lang]).strip()
                     )
+
+
+
+
 # === AnswerChoice ===
     
 # class AnswerChoiceTranslationInline(admin.StackedInline):
@@ -629,7 +633,6 @@ class ExamTranslationInline(admin.StackedInline):
     extra = 1
     fields = ('language', 'title', 'description')
 
-
 class ExamGeneratorForm(forms.Form):
     title_en = forms.CharField(max_length=200, label="Title (English)")
     title_am = forms.CharField(max_length=200, label="Title (Amharic)")
@@ -637,9 +640,25 @@ class ExamGeneratorForm(forms.Form):
     title_or = forms.CharField(max_length=200, label="Title (Oromiffa)", required=False)
 
     difficulty = forms.ChoiceField(
-        choices=[('', 'Any'), ('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')]
+        choices=[('', 'Any'), ('easy', 'Easy'), ('medium', 'Medium'), ('hard', 'Hard')],
+        required=False
     )
-    question_count = forms.IntegerField(min_value=10, max_value=100, initial=50)
+
+    question_count = forms.IntegerField(
+        min_value=10, max_value=100, initial=50,
+        label="Number of Questions"
+    )
+
+    duration_minutes = forms.IntegerField(
+        min_value=10, max_value=180, initial=45,
+        label="Exam Duration (minutes)"
+    )
+
+    passing_score = forms.IntegerField(
+        min_value=50, max_value=100, initial=70,
+        label="Passing Score (%)"
+    )
+
     is_free = forms.BooleanField(required=False, label="Free Exam")
 
     question_type = forms.MultipleChoiceField(
@@ -651,28 +670,44 @@ class ExamGeneratorForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        from django.db.models import Q, Count, Exists, OuterRef
 
-        # SAFE: DB access only after Django is fully ready
         categories = QuestionCategory.objects.annotate(
-            question_count=Count('questions')
-        )
+            total_questions=Count('questions')
+        ).order_by('order', 'code')
 
         for cat in categories:
-            field_name = f"cat_{cat.code}_count"
-            self.fields[field_name] = forms.IntegerField(
-                label=f"{cat.code} ({cat.question_count} available)",
-                min_value=0,
-                initial=0,
-                required=False
+            # Total questions in this category (all, used or not)
+            total = cat.total_questions
+
+            # Fresh/unused questions: those NOT linked to ANY exam
+            unused_qs = Question.objects.filter(
+                category=cat,
+            ).exclude(
+                exams__isnull=False   # exclude any question that appears in at least one exam
             )
-    
+
+            unused_count = unused_qs.count()
+
+            field_name = f"cat_{cat.code}_count"
+            label = f"{cat.code} ({unused_count} fresh / {total} total available)"
+
+            self.fields[field_name] = forms.IntegerField(
+                label=label,
+                min_value=0,
+                max_value=total,           # can't ask for more than total exists
+                initial=0,
+                required=False,
+                help_text=f"{unused_count} not yet used in any exam"
+            )
+
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
-    list_display = ('get_title', 'difficulty', 'duration_minutes', 'question_count', 'passing_score', 'is_free')
+    list_display = ('get_title', 'difficulty', 'duration_minutes', 'question_count', 'passing_score', 'is_free', 'updated_at')
     search_fields = ('translations__title',)
     list_filter = ('difficulty', 'is_free', 'passing_score')
     inlines = [ExamTranslationInline]
-    # filter_horizontal = ('questions',)
+    filter_horizontal = ('questions',)
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -691,6 +726,15 @@ class ExamAdmin(admin.ModelAdmin):
     get_title.short_description = 'Title'
     get_title.admin_order_field = 'translations__title'
     
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        if db_field.name == "questions":
+            # Option A: only show unused questions (strict)
+            kwargs['queryset'] = Question.objects.filter(exams__isnull=True)
+
+            # Option B: show all, but maybe add CSS class or custom widget later
+            # kwargs['queryset'] = Question.objects.all()
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
     def get_urls(self):
         urls = super().get_urls()
         from django.urls import path
@@ -703,15 +747,19 @@ class ExamAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             form = ExamGeneratorForm(request.POST)
             if form.is_valid():
-                # Create exam
+                for cat in QuestionCategory.objects.all():
+                    count_field = f"cat_{cat.code}_count"
+                    value = form.cleaned_data.get(count_field)
+                    if value is None:
+                        form.cleaned_data[count_field] = 0
+                        
                 exam = Exam.objects.create(
                     difficulty=form.cleaned_data['difficulty'] or 'medium',
-                    duration_minutes=45,
-                    question_count=form.cleaned_data['question_count'],
-                    passing_score=74,
+                    duration_minutes=form.cleaned_data['duration_minutes'] or 45,
+                    question_count=form.cleaned_data['question_count'] or 50,
+                    passing_score=form.cleaned_data['passing_score'] or 70,
                     is_free=form.cleaned_data['is_free']
                 )
-
                 # Add translations
                 ExamTranslation.objects.create(exam=exam, language='en', title=form.cleaned_data['title_en'])
                 ExamTranslation.objects.create(exam=exam, language='am', title=form.cleaned_data['title_am'])
@@ -719,37 +767,86 @@ class ExamAdmin(admin.ModelAdmin):
                     ExamTranslation.objects.create(exam=exam, language='ti', title=form.cleaned_data['title_ti'])
                 if form.cleaned_data['title_or']:
                     ExamTranslation.objects.create(exam=exam, language='or', title=form.cleaned_data['title_or'])
-
                 # Collect questions
-                selected_questions = Question.objects.all()
-                filters = Q()
-
-                # Category counts
-                total_needed = form.cleaned_data['question_count']
+                import random
                 assigned = []
-
+                total_needed = form.cleaned_data['question_count']
+                difficulty = form.cleaned_data['difficulty']
+                question_types = form.cleaned_data['question_type']
+                is_free = form.cleaned_data['is_free']
+                is_premium_filter = not is_free  # Free exams use non-premium questions
                 for cat in QuestionCategory.objects.all():
                     count_field = f"cat_{cat.code}_count"
-                    count = form.cleaned_data.get(count_field, 0)
-                    if count > 0:
-                        qs = Question.objects.filter(category=cat)
-                        if form.cleaned_data['difficulty']:
-                            qs = qs.filter(difficulty=form.cleaned_data['difficulty'])
-                        if form.cleaned_data['question_type']:
-                            qs = qs.filter(question_type__in=form.cleaned_data['question_type'])
-                        assigned.extend(list(qs.order_by('?')[:count]))
+                    requested_count = form.cleaned_data[count_field]  # now guaranteed not None
+                    if requested_count <= 0:
+                        continue
 
-                # Fill remaining if needed
+                    # Base queryset (apply difficulty, type, premium filters)
+                    qs = Question.objects.filter(category=cat, is_premium=is_premium_filter)
+                    if difficulty:
+                        qs = qs.filter(difficulty=difficulty)
+                    if question_types:
+                        qs = qs.filter(question_type__in=question_types)
+
+                    # 1. First take as many fresh (unused) as possible
+                    fresh_qs = qs.exclude(exams__isnull=False)          # not in any exam
+                    fresh_list = list(fresh_qs.order_by('?')[:requested_count])
+
+                    assigned.extend(fresh_list)
+
+                    # 2. If still need more → take from already used ones
+                    remaining_needed = requested_count - len(fresh_list)
+                    if remaining_needed > 0:
+                        used_qs = qs.filter(exams__isnull=False)        # already used somewhere
+                        used_list = list(used_qs.order_by('?')[:remaining_needed])
+                        assigned.extend(used_list)
+
+                # After all categories → fill remaining from any category (same preference: fresh first)
                 if len(assigned) < total_needed:
-                    remaining = Question.objects.exclude(id__in=[q.id for q in assigned])
-                    if form.cleaned_data['difficulty']:
-                        remaining = remaining.filter(difficulty=form.cleaned_data['difficulty'])
-                    if form.cleaned_data['question_type']:
-                        remaining = remaining.filter(question_type__in=form.cleaned_data['question_type'])
-                    assigned.extend(list(remaining.order_by('?')[:total_needed - len(assigned)]))
+                    remaining_needed = total_needed - len(assigned)
 
-                exam.questions.set(assigned[:total_needed])
-                self.message_user(request, f"Exam '{form.cleaned_data['title_en']}' generated with {len(assigned)} questions!")
+                    remaining_qs = Question.objects.exclude(id__in=[q.id for q in assigned])
+                    remaining_qs = remaining_qs.filter(is_premium=is_premium_filter)
+                    if difficulty:
+                        remaining_qs = remaining_qs.filter(difficulty=difficulty)
+                    if question_types:
+                        remaining_qs = remaining_qs.filter(question_type__in=question_types)
+
+                    # Fresh first
+                    fresh_remaining = remaining_qs.exclude(exams__isnull=False)
+                    fresh_remaining_list = list(fresh_remaining.order_by('?')[:remaining_needed])
+                    assigned.extend(fresh_remaining_list)
+
+                    # Then used ones if still short
+                    still_needed = remaining_needed - len(fresh_remaining_list)
+                    if still_needed > 0:
+                        used_remaining = remaining_qs.filter(exams__isnull=False)
+                        used_remaining_list = list(used_remaining.order_by('?')[:still_needed])
+                        assigned.extend(used_remaining_list)
+
+                # Final safety: remove any accidental duplicates
+                from collections import OrderedDict
+                assigned = list(OrderedDict.fromkeys(assigned))  # preserve order, remove dups
+                # Ensure no duplicates (safety check)
+                seen = set()
+                assigned = [q for q in assigned if q.id not in seen and not seen.add(q.id)]
+                # Set actual question count
+                actual_count = len(assigned)
+                exam.question_count = actual_count
+                exam.save(update_fields=['question_count'])
+
+                exam.questions.set(assigned)
+
+                message = (
+                    f"Exam '{form.cleaned_data['title_en']}' generated successfully!\n"
+                    f"- {actual_count} questions\n"
+                    f"- Duration: {exam.duration_minutes} minutes\n"
+                    f"- Passing score: {exam.passing_score}%"
+                )
+                if actual_count < form.cleaned_data['question_count']:
+                    message += f"\n(Note: only {actual_count} questions were available)"
+
+                self.message_user(request, message, level='SUCCESS')
                 return redirect('..')
         else:
             form = ExamGeneratorForm()
@@ -761,6 +858,7 @@ class ExamAdmin(admin.ModelAdmin):
         }
         return render(request, 'admin/exam_generate.html', context)
 
+    change_list_template = "admin/core/exam_change_list.html"
 @admin.register(ExamAttempt)
 class ExamAttemptAdmin(admin.ModelAdmin):
     list_display = ('user_profile', 'exam', 'status', 'score', 'is_passed', 'start_time', 'timestamp')

@@ -235,8 +235,9 @@ class Question(models.Model):
         verbose_name=_("Question Type")
     )
     difficulty = models.CharField(max_length=50, default='medium', verbose_name=_("Difficulty"))  # Added for filtering
-
+    
     is_premium = models.BooleanField(default=True)
+    unique = models.BooleanField(default=True, verbose_name=_("Unique"), help_text=_("If true, can only be used in one exam"))
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -410,6 +411,10 @@ class Exam(models.Model):
     passing_score = models.PositiveIntegerField(default=70, help_text=_("Passing percentage"))  # Added per refinement
     is_free = models.BooleanField(default=False)  # For S0
     questions = models.ManyToManyField(Question, related_name='exams')  # Composition
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _("Exam")
@@ -442,7 +447,7 @@ class ExamTranslation(models.Model):
     description = models.TextField()
     
     class Meta:
-        unique_together = ['exam', 'language']
+        unique_together = ['exam', 'language', 'title']
         verbose_name = _("Exam Translation")
         verbose_name_plural = _("Exam Translations")
 
