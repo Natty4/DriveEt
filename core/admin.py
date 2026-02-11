@@ -5,7 +5,8 @@ from uuid import uuid4
 from django.contrib import admin, messages
 from django.utils import timezone
 from django.urls import path
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
+from django.utils.safestring import mark_safe
 from django.shortcuts import render, redirect
 from django.contrib.admin import SimpleListFilter
 from django.contrib.admin.helpers import ActionForm
@@ -708,6 +709,27 @@ class ExamAdmin(admin.ModelAdmin):
     list_filter = ('difficulty', 'is_free', 'passing_score')
     inlines = [ExamTranslationInline]
     filter_horizontal = ('questions',)
+    
+    
+    readonly_fields = ('questions_list', 'question_count',)
+
+    def questions_list(self, obj):
+        if not obj.questions.exists():
+            return "No questions yet"
+
+        items = []
+        for q in obj.questions.select_related('category').order_by('category__code', 'difficulty'):
+            cat = q.category.code if q.category else "—"
+            typ = q.get_question_type_display()
+            items.append(f"• {q} ({cat} – {q.difficulty} – {typ})")
+
+        return format_html_join(
+            mark_safe('<br>'),
+            "{}",
+            ((item,) for item in items)
+        )
+    questions_list.short_description = "Questions in this exam"
+    questions_list.allow_tags = True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
