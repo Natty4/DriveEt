@@ -2,7 +2,7 @@ django-filter
 django-phonenumber-field 
 phonenumbers 
 drf-yasg 
-psycopg2-binary 
+psycopg[binary] 
 redis 
 django-redis 
 google-generativeai 
