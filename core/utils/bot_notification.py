@@ -37,8 +37,6 @@ def notify_user_subscription_activated(user_profile, subscription):
 
     miniapp_url = settings.MINIAPP_LINK
 
-    # Use <tg-time> for native formatting. 
-    # 'D' = Long date (e.g., March 10, 2026)
     if subscription.expiry_date:
         unix_ts = int(subscription.expiry_date.timestamp())
         expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
@@ -59,17 +57,6 @@ def notify_user_subscription_activated(user_profile, subscription):
         "chat_id": user_profile.tg_id,
         "text": message,
         "parse_mode": "HTML",
-        "reply_markup": {
-            "inline_keyboard": [
-                [
-                    {
-                        "text": "🚀 Open Exam App",
-                        "web_app": {"url": miniapp_url},
-                        "style": "primary"  # <--- This makes the button Blue
-                    }
-                ]
-            ]
-        }
     }
 
     try:
