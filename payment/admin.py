@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from core.utils.telegram_notifications import (
+from core.utils.bot_notification import (
     notify_user_subscription_activated, 
     notify_user_subscription_rejected
 )

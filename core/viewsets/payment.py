@@ -14,7 +14,10 @@ from core.serializers.payment import PaymentMethodSerializer, TransactionSeriali
 from core.services.subscription_service import SubscriptionService
 from core.responses import APIResponse
 from core.permissions import IsTelegramAuthenticated
-from core.utils.telegram_bot import send_screenshot_to_admin
+from core.utils.bot_notification import (
+    send_screenshot_to_admin, 
+    notify_user_subscription_under_review
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -65,13 +68,13 @@ class PaymentViewSet(viewsets.ViewSet):
 
         try:
             user_profile = request.user.profile
-
+            tier = SubscriptionTier.objects.get(id=tier_id)
             # 1. Create pending transaction
             transaction_obj = Transaction.objects.create(
                 user_profile=user_profile,
                 subscription_tier_id=tier_id,
                 payment_method_id=payment_method_id,
-                amount=SubscriptionTier.objects.get(id=tier_id).price,
+                amount=tier.price,
                 reference_number=reference_number,
                 account_last_5=account_last_5,
                 screenshot=screenshot,  # Auto-uploads to Cloudinary
@@ -109,6 +112,9 @@ class PaymentViewSet(viewsets.ViewSet):
                     transaction=transaction_obj,
                     screenshot_url=screenshot_url
                 )
+                
+                notify_user_subscription_under_review(user_profile, tier)
+
                 message = "Payment screenshot received. Awaiting admin approval."
             else:
                 message = "Reference verification failed. Awaiting manual review."
