@@ -38,7 +38,7 @@ def notify_user_subscription_activated(user_profile, subscription):
     miniapp_url = settings.MINIAPP_LINK
 
     if subscription.expiry_date:
-        unix_ts = int(subscription.expiry_date.timestamp())
+        unix_ts = int(subscription.expiry_date)
         expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
     else:
         expiry_display = "Permanent"
@@ -47,8 +47,8 @@ def notify_user_subscription_activated(user_profile, subscription):
         f"🎉 <b>Your subscription has been activated!</b>\n\n"
         f"<b>Plan:</b> {subscription.tier.display_name}\n"
         f"<b>Valid until:</b> {expiry_display}\n\n"
-        f"You now have full access to all exams and features.\n\n"
-        f"🏎 <a href='{miniapp_url}'>Driveet Safe</a>"
+        f"❇️ You now have full access to all exams and features.\n\n"
+        f"<a href='{miniapp_url}'>Driveet Safe</a>"
     )
 
     url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
@@ -106,8 +106,8 @@ def notify_user_subscription_under_review(user_profile, tier):
 
     message = (
         f"⏳ <b>Payment Received</b>\n\n"
-        f"Plan: {tier.display_name}\n\n"
-        f"Your payment screenshot has been received and is currently under verification.\n"
+        f"Plan: <b>{tier.display_name}</b>\n\n"
+        f"Your payment screenshot has been received and is currently under verification.\n\n"
         f"You will be notified once your subscription is activated."
     )
 
