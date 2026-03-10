@@ -59,6 +59,18 @@ def notify_user_subscription_activated(user_profile, subscription):
         "chat_id": user_profile.tg_id,
         "text": message,
         "parse_mode": "HTML",
+        
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "🚀 Open Exam App",
+                        "web_app": {"url": miniapp_url},
+                        "color": "blue"  # 2026 Blue styling
+                    }
+                ]
+            ]
+        }
     }
         
     try:
