@@ -1,6 +1,7 @@
 # core/utils/telegram_notifications.py
 import requests
 import logging
+from html import escape 
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -25,29 +26,32 @@ def send_screenshot_to_admin(user, transaction, screenshot_url):
     requests.post(url, json=payload)
 
 
+
+logger = logging.getLogger(__name__)
+
 def notify_user_subscription_activated(user_profile, subscription):
-    """
-    Send Telegram notification using Bot API 9.5 features:
-    - Native date formatting via <tg-time>
-    - Colored 'Primary' (blue) action button
-    """
     if not user_profile.tg_id:
         logger.warning(f"No Telegram ID for user {user_profile.id}")
         return
 
     miniapp_url = settings.MINIAPP_LINK
+    
+    # 1. Escape the display name to prevent HTML parsing errors
+    safe_tier_name = escape(subscription.tier.display_name)
 
+    # 2. Handle the modern date format
     if subscription.expiry_date:
         unix_ts = int(subscription.expiry_date.timestamp())
-        # Use 'unix' attribute and provide fallback text as per docs
+        # Fallback date is short to avoid ENTITY_DATE_TOO_LONG
         fallback_date = subscription.expiry_date.strftime('%d.%m.%Y')
         expiry_display = f'<tg-time unix="{unix_ts}" format="D">{fallback_date}</tg-time>'
     else:
         expiry_display = "Permanent"
 
+    # 3. Construct the message
     message = (
         f"🎉 <b>Your subscription has been activated!</b>\n\n"
-        f"<b>Plan:</b> {subscription.tier.display_name}\n"
+        f"<b>Plan:</b> {safe_tier_name}\n"
         f"<b>Valid until:</b> {expiry_display}\n\n"
         f"❇️ You now have full access to all exams and features.\n\n"
         f"Launch the exam app and enjoy <a href='{miniapp_url}'>Driveet Safe</a>"
@@ -59,14 +63,13 @@ def notify_user_subscription_activated(user_profile, subscription):
         "chat_id": user_profile.tg_id,
         "text": message,
         "parse_mode": "HTML",
-        
         "reply_markup": {
             "inline_keyboard": [
                 [
                     {
                         "text": "🚀 Open Exam App",
-                        "web_app": {"url": miniapp_url},
-                        "color": "blue"  # 2026 Blue styling
+                        "url": miniapp_url,
+                        "color": "blue" 
                     }
                 ]
             ]
@@ -76,8 +79,7 @@ def notify_user_subscription_activated(user_profile, subscription):
     try:
         response = requests.post(url, json=payload)
         if response.status_code != 200:
-            logger.error(f"TG API Error, Failed to notify activation to user : {response.text}")
-        response.raise_for_status()
+            logger.error(f"TG API Error: {response.text}")
     except Exception as e:
         logger.exception(f"TG notification failed: {e}")
  
