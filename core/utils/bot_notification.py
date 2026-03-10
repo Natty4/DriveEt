@@ -40,7 +40,7 @@ def notify_user_subscription_activated(user_profile, subscription):
     if subscription.expiry_date:
         unix_ts = int(subscription.expiry_date.timestamp())
         # Use 'unix' attribute and provide fallback text as per docs
-        expiry_display = f'<tg-time unix="{unix_ts}" format="D">{subscription.expiry_date}</tg-time>'
+        expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
     else:
         expiry_display = "Permanent"
 
