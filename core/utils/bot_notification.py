@@ -16,7 +16,7 @@ def send_screenshot_to_admin(user, transaction, screenshot_url):
         f"Screenshot: {screenshot_url}"
     )
 
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": chat_id,
         "text": message,
@@ -27,34 +27,57 @@ def send_screenshot_to_admin(user, transaction, screenshot_url):
 
 def notify_user_subscription_activated(user_profile, subscription):
     """
-    Send Telegram notification to user when subscription is activated.
+    Send Telegram notification using Bot API 9.5 features:
+    - Native date formatting via <tg-time>
+    - Colored 'Primary' (blue) action button
     """
     if not user_profile.tg_id:
         logger.warning(f"No Telegram ID for user {user_profile.id}")
         return
 
+    miniapp_url = settings.MINIAPP_LINK
+
+    # Use <tg-time> for native formatting. 
+    # 'D' = Long date (e.g., March 10, 2026)
+    if subscription.expiry_date:
+        unix_ts = int(subscription.expiry_date.timestamp())
+        expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
+    else:
+        expiry_display = "Permanent"
+
     message = (
-        f"🎉 Your subscription has been activated!\n\n"
-        f"Plan: {subscription.tier.display_name}\n"
-        f"Valid until: {subscription.expiry_date.strftime('%Y-%m-%d') if subscription.expiry_date else 'Permanent'}\n"
-        f"Enjoy full access to all exams and features!"
+        f"🎉 <b>Your subscription has been activated!</b>\n\n"
+        f"<b>Plan:</b> {subscription.tier.display_name}\n"
+        f"<b>Valid until:</b> {expiry_display}\n\n"
+        f"You now have full access to all exams and features.\n\n"
+        f"🏎 <a href='{miniapp_url}'>Driveet Safe</a>"
     )
 
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
+
     payload = {
         "chat_id": user_profile.tg_id,
         "text": message,
-        "parse_mode": "HTML"
+        "parse_mode": "HTML",
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {
+                        "text": "🚀 Open Exam App",
+                        "web_app": {"url": miniapp_url},
+                        "style": "primary"  # <--- This makes the button Blue
+                    }
+                ]
+            ]
+        }
     }
 
     try:
         response = requests.post(url, json=payload)
-        if response.status_code != 200:
-            logger.error(f"Failed to notify user {user_profile.tg_id}: {response.text}")
+        response.raise_for_status()
     except Exception as e:
-        logger.exception(f"Telegram notification failed for user {user_profile.tg_id}")
+        logger.exception(f"Telegram notification failed: {e}")
         
-
 def notify_user_subscription_rejected(user_profile):
     """
     Notify user when admin rejects their payment/transaction.
@@ -70,7 +93,7 @@ def notify_user_subscription_rejected(user_profile):
         f"We appreciate your patience!"
     )
 
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": user_profile.tg_id,
         "text": message,
@@ -101,7 +124,7 @@ def notify_user_subscription_under_review(user_profile, tier):
         f"You will be notified once your subscription is activated."
     )
 
-    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+    url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": user_profile.tg_id,
         "text": message,

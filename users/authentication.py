@@ -76,7 +76,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
         """
         Validate Telegram WebApp initData and extract user info
         """
-        if not settings.TELEGRAM_BOT_TOKEN:
+        if not settings.BOT_TOKEN:
             if settings.DEBUG:
                 return self._mock_validate_telegram_init_data(init_data)
             raise AuthenticationFailed("Telegram auth misconfigured")
@@ -106,7 +106,7 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             # Create secret key
             secret_key = hmac.new(
                 key=b"WebAppData",
-                msg=settings.TELEGRAM_BOT_TOKEN.encode(),
+                msg=settings.BOT_TOKEN.encode(),
                 digestmod=hashlib.sha256
             ).digest()
             

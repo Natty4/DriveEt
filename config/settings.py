@@ -138,7 +138,7 @@ CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if os.ge
 CORS_ALLOW_CREDENTIALS = True
 
 # Telegram Bot
-TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
 ADMIN_CHAT_ID = os.getenv('ADMIN_CHAT_ID', '')
 
 
