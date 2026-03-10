@@ -39,7 +39,8 @@ def notify_user_subscription_activated(user_profile, subscription):
 
     if subscription.expiry_date:
         unix_ts = int(subscription.expiry_date.timestamp())
-        expiry_display = f'<tg-date timestamp="{unix_ts}" format="long"/>'
+        # Use 'unix' attribute and provide fallback text as per docs
+        expiry_display = f'<tg-time unix="{unix_ts}" format="D">{subscription.expiry_date}</tg-time>'
     else:
         expiry_display = "Permanent"
 
@@ -58,13 +59,14 @@ def notify_user_subscription_activated(user_profile, subscription):
         "text": message,
         "parse_mode": "HTML",
     }
-
+        
     try:
         response = requests.post(url, json=payload)
         if response.status_code != 200:
-            logger.error(f"Failed to notify activation to user {user_profile.tg_id}: {response.text}")
+            logger.error(f"TG API Error, Failed to notify activation to user : {response.text}")
+        response.raise_for_status()
     except Exception as e:
-        logger.exception(f"Telegram notification failed: {e}")
+        logger.exception(f"TG notification failed: {e}")
  
         
 def notify_user_subscription_rejected(user_profile):
