@@ -38,8 +38,8 @@ def notify_user_subscription_activated(user_profile, subscription):
     miniapp_url = settings.MINIAPP_LINK
 
     if subscription.expiry_date:
-        unix_ts = int(subscription.expiry_date)
-        expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
+        unix_ts = int(subscription.expiry_date.timestamp())
+        expiry_display = f'<tg-date timestamp="{unix_ts}" format="long"/>'
     else:
         expiry_display = "Permanent"
 
@@ -64,6 +64,7 @@ def notify_user_subscription_activated(user_profile, subscription):
         response.raise_for_status()
     except Exception as e:
         logger.exception(f"Telegram notification failed: {e}")
+ 
         
 def notify_user_subscription_rejected(user_profile):
     """
