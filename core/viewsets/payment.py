@@ -96,7 +96,7 @@ class PaymentViewSet(viewsets.ViewSet):
                 except ValidationError as e:
                     logger.info(f"Auto-verification failed: {e}. Falling back to manual review.")
                     return APIResponse.error(
-                        message="An error occurred during purchase. Please try again.",
+                        message="An error occurred during verification. Please try again with different verification method.",
                         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
                     )
 
@@ -121,7 +121,7 @@ class PaymentViewSet(viewsets.ViewSet):
         except Exception as e:
             logger.exception("Purchase error")
             return APIResponse.error(
-                message="An error occurred during purchase. Please try again.",
+                message="An error occurred during purchase. Please try again. or reachout the support team",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
