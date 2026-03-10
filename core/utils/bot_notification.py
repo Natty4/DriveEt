@@ -61,7 +61,8 @@ def notify_user_subscription_activated(user_profile, subscription):
 
     try:
         response = requests.post(url, json=payload)
-        response.raise_for_status()
+        if response.status_code != 200:
+            logger.error(f"Failed to notify activation to user {user_profile.tg_id}: {response.text}")
     except Exception as e:
         logger.exception(f"Telegram notification failed: {e}")
  
