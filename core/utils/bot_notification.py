@@ -40,7 +40,8 @@ def notify_user_subscription_activated(user_profile, subscription):
     if subscription.expiry_date:
         unix_ts = int(subscription.expiry_date.timestamp())
         # Use 'unix' attribute and provide fallback text as per docs
-        expiry_display = f'<tg-time unix="{unix_ts}" format="D">date</tg-time>'
+        fallback_date = subscription.expiry_date.strftime('%d.%m.%Y')
+        expiry_display = f'<tg-time unix="{unix_ts}" format="D">{fallback_date}</tg-time>'
     else:
         expiry_display = "Permanent"
 
@@ -49,7 +50,7 @@ def notify_user_subscription_activated(user_profile, subscription):
         f"<b>Plan:</b> {subscription.tier.display_name}\n"
         f"<b>Valid until:</b> {expiry_display}\n\n"
         f"❇️ You now have full access to all exams and features.\n\n"
-        f"<a href='{miniapp_url}'>Driveet Safe</a>"
+        f"Launch the exam app and enjoy <a href='{miniapp_url}'>Driveet Safe</a>"
     )
 
     url = f"https://api.telegram.org/bot{settings.BOT_TOKEN}/sendMessage"
