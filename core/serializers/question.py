@@ -1,5 +1,7 @@
 # core/serializers/question.py
 
+import random
+from datetime import date
 from rest_framework import serializers
 from core.models import (
     Question,
@@ -46,7 +48,8 @@ class ExplanationSerializer(serializers.ModelSerializer, AllTranslationsMixin):
 
 class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
     translations = serializers.SerializerMethodField()
-    choices = AnswerChoiceSerializer(many=True, read_only=True)
+    # choices = AnswerChoiceSerializer(many=True, read_only=True)
+    choices = serializers.SerializerMethodField()
     explanation = ExplanationSerializer(read_only=True)
     associated_road_sign = RoadSignSerializer(read_only=True)
     effective_image_url = serializers.SerializerMethodField()
@@ -89,4 +92,37 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             '/upload/w_400,h_400,c_fill,q_auto,f_auto/'
         )
     
+    def get_choices(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        choices = list(obj.choices.all())
+        
+        total = len(choices)
+        if total <= 2:
+            # Too few choices to shuffle
+            return AnswerChoiceSerializer(choices, many=True, context=self.context).data
+
+        # Split last choice
+        normal_choices = choices[:-1]   # shuffle these
+        last_choice = choices[-1:]      # keep last as is
+
+        # Create deterministic seed
+        seed = f"{user.id if user.id else 'anon'}-{obj.id}"
+   
+        # Include today's date for daily shuffling
+        # today_str = date.today().isoformat()  # e.g. '2026-03-11'
+        # seed = f"{user.id if user.id else 'anon'}-{obj.id}-{today_str}"
+
+        rng = random.Random(seed)
+        rng.shuffle(normal_choices)
+        
+        # Combine shuffled + last choice
+        final_choices = normal_choices + last_choice
+
+        return AnswerChoiceSerializer(
+            final_choices,
+            many=True,
+            context=self.context
+        ).data
     

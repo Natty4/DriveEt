@@ -712,6 +712,26 @@ class ExamAdmin(admin.ModelAdmin):
     
     
     readonly_fields = ('questions_list', 'question_count',)
+    actions = ['shuffle_exam_answers']
+    
+    @admin.action(description="Shuffle answer choices for all questions in selected exams")
+    def shuffle_exam_answers(self, request, queryset):
+        import random
+
+        total = 0
+
+        for exam in queryset:
+            for question in exam.questions.all():
+                choices = list(question.choices.all())
+                random.shuffle(choices)
+
+                for i, c in enumerate(choices, start=1):
+                    c.order = i
+                    c.save(update_fields=["order"])
+
+                total += 1
+
+        self.message_user(request, f"Shuffled answers for {total} questions.")
 
     def questions_list(self, obj):
         if not obj.questions.exists():

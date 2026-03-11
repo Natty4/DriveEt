@@ -325,6 +325,16 @@ class AnswerChoice(models.Model):
         translation = self.translations.filter(language='en').first()
         return f"{translation.text[:50]}..." if translation else f"Choice {self.id}"
 
+    def save(self, *args, **kwargs):
+        if not self.order:
+            last = AnswerChoice.objects.filter(
+                question=self.question
+            ).order_by('-order').first()
+
+            self.order = (last.order + 1) if last else 1
+
+        super().save(*args, **kwargs)
+
     @property
     def is_image_option(self):
         return self.road_sign_option is not None
