@@ -317,7 +317,7 @@ class AnswerChoice(models.Model):
         verbose_name = _("Answer Choice")
         verbose_name_plural = _("Answer Choices")
         ordering = ['order']
-        unique_together = ['question', 'order', 'is_correct']
+        # unique_together = ['question', 'order']
 
     def __str__(self):
         if self.road_sign_option:
