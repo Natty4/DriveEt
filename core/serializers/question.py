@@ -89,7 +89,7 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
         # Same Cloudinary optimization
         return url.replace(
             '/upload/',
-            '/upload/w_400,h_400,c_fill,q_auto,f_auto/'
+            '/upload/w_400,h_400,c_limit,q_auto,f_auto/'
         )
     
     def get_choices(self, obj):
