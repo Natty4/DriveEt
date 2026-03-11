@@ -23,7 +23,7 @@ class UserProfile(models.Model):
     tg_id = models.CharField(max_length=50, unique=True, db_index=True)  # Primary identifier
     tg_username = models.CharField(max_length=255, blank=True, null=True)
     tg_data = models.JSONField(default=dict, blank=True)  # Raw Telegram user data
-    preferred_language = models.CharField(max_length=10, choices=Language.choices(), default=Language.ENGLISH.value)
+    preferred_language = models.CharField(max_length=10, choices=Language.choices(), default=Language.AMHARIC.value)
     active_subscription = models.ForeignKey('Subscription', on_delete=models.SET_NULL, null=True, blank=True, related_name='active_users')
     expiry_date = models.DateTimeField(null=True, blank=True)  # Denormalized for quick checks
 
