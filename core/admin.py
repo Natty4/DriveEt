@@ -96,7 +96,7 @@ class RoadSignAdmin(admin.ModelAdmin):
         """Safe preview for Cloudinary or local images"""
         if obj.image:
             # Use Cloudinary optimized URL
-            url = obj.image.url.replace('/upload/', '/upload/w_150,h_150,c_fill,q_auto/')
+            url = obj.image.url.replace('/upload/', '/upload/w_150,c_limit,q_auto,f_auto/')
             return format_html('<img src="{}" width="100" style="border-radius:8px;"/>', url)
         return "No image"
     image_preview.short_description = "Preview"
@@ -544,10 +544,32 @@ class QuestionAdmin(admin.ModelAdmin):
 #     fields = ('media_url', 'media_type')
 #     inlines = [ExplanationTranslationInline]
 
-@admin.register(Explanation)  
+@admin.register(Explanation)
 class ExplanationAdmin(admin.ModelAdmin):
-    extra = 1
     inlines = [ExplanationTranslationInline]
+    
+    # Filters on related fields
+    list_filter = (
+        'question__question_type',    # Filter by question type
+        'question__category',         # Filter by question category
+    )
+    
+    # Search by question content (via translations) or question ID
+    search_fields = (
+        'question__id',               # Search by question ID
+        'question__translations__content',  # Search in translated content
+    )
+    
+    # Optional: display these fields in list view
+    list_display = ('question', 'get_question_type', 'get_question_category', 'media_type')
+    
+    def get_question_type(self, obj):
+        return obj.question.question_type
+    get_question_type.short_description = 'Question Type'
+    
+    def get_question_category(self, obj):
+        return obj.question.category
+    get_question_category.short_description = 'Category'
     
     
 # === Question ===
