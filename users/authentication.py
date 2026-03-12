@@ -124,8 +124,8 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
             
             # Extract user data
             user_json = parsed_data.get('user')
-            logger.error("user json: ", user_json)
-            logger.error("user hash data: ", init_data)
+            logger.error(f"user json: {user_json}")
+            logger.error(f"user hash data: {init_data}")
             if not user_json:
                 logger.error("No user data in init_data")
                 return None
