@@ -3,7 +3,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import logging
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class PaymentViewSet(viewsets.ViewSet):
     permission_classes = [IsTelegramAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
 
     @action(detail=False, methods=['get'])
     def methods(self, request):
