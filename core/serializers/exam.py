@@ -1,5 +1,6 @@
 # core/serializers/exam.py
 
+import random
 from rest_framework import serializers
 from core.models import Exam, ExamTranslation
 from users.models import ExamAttempt
@@ -51,11 +52,20 @@ class ExamMetadataSerializer(serializers.ModelSerializer, AllTranslationsMixin):
 
 class ExamDetailSerializer(serializers.ModelSerializer, AllTranslationsMixin):
     translations = serializers.SerializerMethodField()
-    questions = QuestionSerializer(many=True, read_only=True)
+    # questions = QuestionSerializer(many=True, read_only=True)
+    questions = serializers.SerializerMethodField()
 
     class Meta:
         model = Exam
-        fields = ['id', 'translations', 'difficulty', 'duration_minutes', 'question_count', 'passing_score', 'questions']
+        fields = [
+            'id',
+            'translations',
+            'difficulty',
+            'duration_minutes',
+            'question_count',
+            'passing_score',
+            'questions'
+        ]
 
     def get_translations(self, obj):
         return self.get_translations_dict(
@@ -63,6 +73,24 @@ class ExamDetailSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             obj.translations.all(),
             fields=['title', 'description']
         )
+
+    def get_questions(self, obj):
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        questions = list(obj.questions.all())
+
+        # deterministic shuffle (same per user + exam)
+        seed = f"{user.id if user.id else 'anon'}-{obj.id}"
+
+        rng = random.Random(seed)
+        rng.shuffle(questions)
+
+        return QuestionSerializer(
+            questions,
+            many=True,
+            context=self.context
+        ).data
 
 class ExamAttemptSerializer(serializers.ModelSerializer):
     class Meta:
