@@ -1,7 +1,7 @@
 # core/serializers/question.py
 
 import random
-from datetime import date
+from datetime import date, datetime
 from rest_framework import serializers
 from core.models import (
     Question,
@@ -99,9 +99,8 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
         normal_choices = choices[:-1]   # shuffle these
         last_choice = choices[-1:]      # keep last as is
 
-        # Create deterministic seed includes date for daily shuffling
-        today_str = date.today().isoformat()
-        seed = f"{user.id if user.id else 'anon'}-{obj.id}-{today_str}"
+        hour_str = datetime.now().strftime("%Y-%m-%d-%H")
+        seed = f"{user.id if user else 'anon'}-{obj.id}-{hour_str}"
 
         rng = random.Random(seed)
         rng.shuffle(normal_choices)
