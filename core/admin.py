@@ -726,7 +726,7 @@ class ExamGeneratorForm(forms.Form):
 
 @admin.register(Exam)
 class ExamAdmin(admin.ModelAdmin):
-    list_display = ('get_title', 'difficulty', 'duration_minutes', 'question_count', 'passing_score', 'is_free', 'updated_at')
+    list_display = ('get_title', 'difficulty', 'duration_minutes', 'question_count', 'passing_score', 'is_free', 'updated_at', 'is_active')
     search_fields = ('translations__title',)
     list_filter = ('difficulty', 'is_free', 'passing_score')
     inlines = [ExamTranslationInline]
@@ -734,7 +734,21 @@ class ExamAdmin(admin.ModelAdmin):
     
     
     readonly_fields = ('questions_list', 'question_count',)
-    actions = ['shuffle_exam_answers']
+    actions = ['shuffle_exam_answers',
+               'activate_exams',
+                'deactivate_exams',
+               ]
+    
+    @admin.action(description="Activate selected exams")
+    def activate_exams(self, request, queryset):
+        updated = queryset.update(is_active=True)
+        self.message_user(request, f"{updated} exam(s) activated.")
+
+
+    @admin.action(description="Deactivate selected exams")
+    def deactivate_exams(self, request, queryset):
+        updated = queryset.update(is_active=False)
+        self.message_user(request, f"{updated} exam(s) deactivated.")
     
     @admin.action(description="Shuffle answer choices for all questions in selected exams")
     def shuffle_exam_answers(self, request, queryset):
