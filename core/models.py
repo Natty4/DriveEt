@@ -420,6 +420,7 @@ class Exam(models.Model):
     question_count = models.PositiveIntegerField(default=50)
     passing_score = models.PositiveIntegerField(default=70, help_text=_("Passing percentage"))  # Added per refinement
     is_free = models.BooleanField(default=False)  # For S0
+    is_active = models.BooleanField(default=True)
     questions = models.ManyToManyField(Question, related_name='exams')  # Composition
     
     # Metadata

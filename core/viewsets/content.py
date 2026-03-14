@@ -66,7 +66,7 @@ class ContentViewSet(viewsets.ViewSet):
             )
 
         # Optimized prefetch for all nested translated + related data
-        exam = Exam.objects.prefetch_related(
+        exam = Exam.objects.filter(is_active=True).prefetch_related(
             'translations',
             Prefetch(
                 'questions',
@@ -92,6 +92,7 @@ class ContentViewSet(viewsets.ViewSet):
 
         profile = request.user.profile
         exams = Exam.objects.filter(
+            is_active=True,
             tiers__subscription__user_profile=profile,
             tiers__subscription__expiry_date__gt=timezone.now()
         ).distinct().prefetch_related(

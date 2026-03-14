@@ -17,13 +17,14 @@ def get_exams_for_user(user_profile):
     
     if user_profile.is_subscribed():
         exams_qs = Exam.objects.filter(
+            is_active=True,
             tiers__subscription__user_profile=user_profile,
             tiers__subscription__expiry_date__gt=timezone.now(),
             tiers__subscription__is_active=True,
             attempts__deleted_at__isnull=True
         ).distinct()
     else:
-        exams_qs = Exam.objects.filter(is_free=True)
+        exams_qs = Exam.objects.filter(is_active=True, is_free=True)
         
     return exams_qs.annotate(
             status=Case(
