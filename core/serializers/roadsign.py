@@ -19,10 +19,6 @@ class RoadSignSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             fields=['name', 'meaning', 'detailed_explanation']
         )
 
-    # def get_image_url(self, obj):
-    #     request = self.context.get('request')
-    #     return request.build_absolute_uri(obj.image.url) if obj.image and request else None
-
 
     def get_image_url(self, obj):
         if not obj.image:
@@ -31,7 +27,6 @@ class RoadSignSerializer(serializers.ModelSerializer, AllTranslationsMixin):
         # Cloudinary auto-optimized URL (w=400, quality auto, best format)
         url = obj.image.url
 
-        # Optional: Add transformations for performance
         # Resize to 400px width, auto quality/format, fill crop
         optimized_url = url.replace(
             '/upload/',

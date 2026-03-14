@@ -69,14 +69,6 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
             obj.translations.all(),
             fields=['content']
         )
-
-    # def get_effective_image_url(self, obj):
-    #     request = self.context.get('request')
-    #     if obj.associated_road_sign and obj.associated_road_sign.image:
-    #         return request.build_absolute_uri(obj.associated_road_sign.image.url)
-    #     elif obj.media_image:
-    #         return request.build_absolute_uri(obj.media_image.url)
-    #     return None
     
     def get_effective_image_url(self, obj):
         if obj.associated_road_sign and obj.associated_road_sign.image:
@@ -107,12 +99,9 @@ class QuestionSerializer(serializers.ModelSerializer, AllTranslationsMixin):
         normal_choices = choices[:-1]   # shuffle these
         last_choice = choices[-1:]      # keep last as is
 
-        # Create deterministic seed
-        seed = f"{user.id if user.id else 'anon'}-{obj.id}"
-   
-        # Include today's date for daily shuffling
-        # today_str = date.today().isoformat()  # e.g. '2026-03-11'
-        # seed = f"{user.id if user.id else 'anon'}-{obj.id}-{today_str}"
+        # Create deterministic seed includes date for daily shuffling
+        today_str = date.today().isoformat()
+        seed = f"{user.id if user.id else 'anon'}-{obj.id}-{today_str}"
 
         rng = random.Random(seed)
         rng.shuffle(normal_choices)
