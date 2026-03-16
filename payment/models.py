@@ -17,7 +17,7 @@ from users.models import Subscription
 class PaymentMethod(models.Model):
     """Available payment methods"""
     class MethodType(models.TextChoices):
-        BANK_TRANSFER = 'bank_transfer', _('Bank Transfer')
+        BANK_TRANSFER = 'BANK_TRANSFER', _('Bank Transfer')
         MOBILE_WALLET = 'MOBILE_WALLET', _('Mobile Wallet')
         OTHER = 'other', _('Other Method')
 
