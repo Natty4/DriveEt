@@ -33,7 +33,11 @@ class UserProfile(models.Model):
     class Meta:
         verbose_name = _("User Profile")
         verbose_name_plural = _("User Profiles")
-        indexes = [models.Index(fields=['tg_id', 'expiry_date'])]
+        indexes = [
+                    models.Index(fields=['expiry_date']),
+                    models.Index(fields=["tg_id"])
+                ]
+        
 
     def __str__(self):
         return f"User {self.tg_username}"
@@ -48,7 +52,6 @@ class UserProfile(models.Model):
         if not self.is_subscribed():
             return 1  # Free tier
         return self.active_subscription.tier.max_exam_number
-
 
 class SubscriptionTier(models.Model):
     """Defines tiers (S0 free, S1, etc.). 

@@ -6,7 +6,7 @@ import hashlib
 import logging
 import urllib.parse
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple, TYPE_CHECKING
 from django.conf import settings
 from django.db import transaction, IntegrityError
@@ -179,45 +179,45 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
 
     def get_or_create_user(self, tg_user: Dict) -> Tuple[User, bool]:
         """
-        Get or create Django user from Telegram user data (atomic).
+        Get or create Django user from Telegram user data.
         If any step fails, NOTHING is created.
-        Also updates last_login efficiently.
+        Updates last_login only if the previous login was >3 minutes ago.
         """
+
         from users.models import UserProfile
 
         tg_id = tg_user["id"]
+        username = tg_user.get("username") or f"tg_{tg_id}"
+
         now = timezone.now()
+        login_threshold = now - timedelta(minutes=3)
 
         try:
-            with transaction.atomic():
+            # SINGLE QUERY lookup
+            user = (
+                User.objects
+                .select_related("profile")
+                .filter(profile__tg_id=tg_id)
+                .first()
+            )
 
-                profile = (
-                    UserProfile.objects
-                    .select_for_update()
-                    .select_related("user")
-                    .filter(tg_id=tg_id)
-                    .first()
-                )
+            if user:
+                profile = user.profile
 
-                if profile:
-                    user = profile.user
-                    username = tg_user.get("username") or f"tg_{tg_id}"
-                    updated = False
+                if profile.tg_username != username:
+                    UserProfile.objects.filter(id=profile.id).update(
+                        tg_username=username
+                    )
+                    profile.tg_username = username
 
-                    if profile.tg_username != username:
-                        profile.tg_username = username
-                        updated = True
-
-                    if updated:
-                        profile.save(update_fields=["tg_username"])
-
-                    # Efficient last_login update (no model save)
+                if not user.last_login or user.last_login < login_threshold:
                     User.objects.filter(id=user.id).update(last_login=now)
+                    user.last_login = now
 
-                    user.last_login = now  # keep in-memory instance consistent
-                    return user, False
+                return user, False
 
-                username = tg_user.get("username") or f"telegram_{tg_id}"
+            # create new user
+            with transaction.atomic():
 
                 user = User.objects.create(
                     username=username,
@@ -237,10 +237,20 @@ class TelegramAuthenticationBackend(authentication.BaseAuthentication):
                 user._fresh_login = True
                 return user, True
 
-        except IntegrityError as e:
-            logger.error("Telegram user creation integrity error", exc_info=e)
-            raise AuthenticationFailed("User creation failed, please retry")
+        except IntegrityError:
+            # race condition fallback
+            user = (
+                User.objects
+                .select_related("profile")
+                .get(profile__tg_id=tg_id)
+            )
+
+            if not user.last_login or user.last_login < login_threshold:
+                User.objects.filter(id=user.id).update(last_login=now)
+                user.last_login = now
+
+            return user, False
 
         except Exception:
-            logger.exception("Unexpected error during Telegram user creation")
+            logger.exception("Unexpected error during TG user creation")
             raise AuthenticationFailed("Authentication failed")
